@@ -60,4 +60,5 @@ Artisan::add(new \Seat\Commands\Scheduled\EveEveUpdater);
 Artisan::add(new \Seat\Commands\Scheduled\EveMapUpdater);
 Artisan::add(new \Seat\Commands\Scheduled\EveServerUpdater);
 Artisan::add(new \Seat\Commands\Scheduled\SeatQueueCleanup);
+Artisan::add(new \Seat\Commands\Scheduled\SecurityUpdater);
 Artisan::add(new \Seat\Commands\Scheduled\SeatNotify);

@@ -128,6 +128,7 @@
             <li><a href="{{ action('UserController@getAll') }}"><i class="fa fa-angle-double-right"></i> Users</a></li>
             <li><a href="{{ action('GroupsController@getAll') }}"><i class="fa fa-angle-double-right"></i> Groups</a></li>
             <li><a href="{{ action('SettingsController@getSettings') }}"><i class="fa fa-angle-double-right"></i> SeAT Settings</a></li>
+            <li><a href="{{ action('SecurityController@getSettings') }}"><i class="fa fa-angle-double-right"></i> Security Alerts</a></li>
           </ul>
         </li>
       @endif
