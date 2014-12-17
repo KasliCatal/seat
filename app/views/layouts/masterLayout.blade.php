@@ -132,6 +132,22 @@
         });
       })();
 
+      // Periodically check the top status bar for security
+      // related information
+      (function worker() {
+        $.ajax({
+          type: "get",
+          url: "{{ URL::to('security/short-status') }}",
+          success: function(data) {
+            $("span#security_count").text(data.security_count);
+          },
+          complete: function() {
+            // Schedule the next request when the current one's complete
+            setTimeout(worker, 10000); // 10 Seconds
+          }
+        });
+      })();
+
       // Specify the location of the search controller
       var search_location = "{{ action('DashboardController@getSearch') }}"
 
