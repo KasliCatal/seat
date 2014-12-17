@@ -1,6 +1,30 @@
 <?php
+/*
+The MIT License (MIT)
 
-class DashboardController extends BaseController {
+Copyright (c) 2014 eve-seat
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+*/
+
+class DashboardController extends BaseController
+{
 
     public function __construct()
     {
@@ -17,10 +41,10 @@ class DashboardController extends BaseController {
     |
     */
 
-	public function getDashboard()
-	{
-		return View::make('home');
-	}
+    public function getDashboard()
+    {
+        return View::make('home');
+    }
 
     /*
     |--------------------------------------------------------------------------
@@ -51,7 +75,7 @@ class DashboardController extends BaseController {
                 ->where('characterName', 'like', '%' . Input::get('q') . '%');
 
             // Ensure we only get result for characters we have access to
-            if (!Sentry::getUser()->hasAccess('recruiter'))
+            if (!\Auth::hasAccess('recruiter'))
                 $characters = $characters->whereIn('seat_keys.keyID', Session::get('valid_keys'))
                     ->get();
             else
@@ -88,7 +112,7 @@ class DashboardController extends BaseController {
                 ->join('account_apikeyinfo_characters', 'account_apikeyinfo_characters.characterID', '=', 'a.characterID');
 
             // If the user is not a superuser, filter the results down to keys they own
-            if (!Sentry::getUser()->isSuperUser())
+            if (!\Auth::isSuperUser() )
                 $character_assets = $character_assets->whereIn('account_apikeyinfo_characters.keyID', Session::get('valid_keys'));
 
             // Complete the search
@@ -109,7 +133,7 @@ class DashboardController extends BaseController {
                 ->where('character_contactlist.contactName', 'like', '%' . Input::get('q') . '%');
 
             // Ensure we only get result for characters we have access to
-            if (!Sentry::getUser()->hasAccess('recruiter'))
+            if (!\Auth::hasAccess('recruiter'))
                 $character_contactlist = $character_contactlist->whereIn('account_apikeyinfo_characters.keyID', Session::get('valid_keys'))
                     ->get();
             else
@@ -129,7 +153,7 @@ class DashboardController extends BaseController {
                 ->orWhere('character_mailbodies.body', 'like', '%' . Input::get('q') . '%');
 
             // Ensure we only get result for characters we have access to
-            if (!Sentry::getUser()->hasAccess('recruiter'))
+            if (!\Auth::hasAccess('recruiter'))
                 $character_mail = $character_mail->whereIn('account_apikeyinfo_characters.keyID', Session::get('valid_keys'));
 
             $character_mail = $character_mail
@@ -137,7 +161,6 @@ class DashboardController extends BaseController {
                 ->orderBy('character_mailmessages.sentDate', 'desc')
                 ->take(50)
                 ->get();
-
 
             // Return the AJAX response
             return View::make('search')
