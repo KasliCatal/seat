@@ -77,20 +77,20 @@ class SecurityController extends BaseController {
 
         $search_criteria = htmlspecialchars($search_criteria);
 
-        $searchCharacters = DB::table('security_events')
+        $search_characters = DB::table('security_events')
             ->join('eve_characterinfo','eve_characterinfo.characterID','=','security_events.characterID')
             ->join('security_alerts','security_alerts.alertID','=','security_events.alertID')
             ->where('eve_characterinfo.characterName','like',"%$search_criteria%")
             ->select('security_events.*', 'security_alerts.alertName');
-        $searchEvents = DB::table('security_events')
+        $search_events = DB::table('security_events')
             ->join('security_alerts','security_alerts.alertID','=','security_events.alertID')
             ->where('id',$search_criteria)
             ->select('security_events.*', 'security_alerts.alertName')
-            ->union($searchCharacters)
+            ->union($search_characters)
             ->get();
-        if ($searchEvents){
+        if ($search_events){
 
-            foreach ($searchEvents as $row) {
+            foreach ($search_events as $row) {
 
                 $events[$row->id] = array (
                     'eventid'         => $row->id,
@@ -119,14 +119,14 @@ class SecurityController extends BaseController {
 
     public function characterPeopleGroup($characterID)
     {
-        $characterPeopleGroup = DB::table('seat_people_main')
+        $character_people_group = DB::table('seat_people_main')
                 ->join('seat_people','seat_people_main.personID','=','seat_people.personID')
                 ->join('account_apikeyinfo_characters','account_apikeyinfo_characters.keyID','=','seat_people.keyID')
                 ->where('account_apikeyinfo_characters.characterID',$characterID)
                 ->select('seat_people_main.characterID')
                 ->first();
-        if (isset ($characterPeopleGroup )){
-            return $characterPeopleGroup->characterID;
+        if (isset ($character_people_group )){
+            return $character_people_group->characterID;
         }else{
             return $characterID;
         }
@@ -145,18 +145,18 @@ class SecurityController extends BaseController {
     public function getDetails($eventid)
     {
         $eventid = htmlspecialchars($eventid);
-        $eventDetails = \DB::table('security_events')
+        $event_details = \DB::table('security_events')
             ->join('security_alerts','security_alerts.alertID','=','security_events.alertID')
             ->where('id',$eventid)
             ->first();
-        $event[$eventDetails->id] = array (
-            'eventid'         => $eventDetails->id,
-            'characterID'     => $eventDetails->characterID,
-            'peopleGroupID'   => $this->characterPeopleGroup($eventDetails->characterID),
-            'description'     => $eventDetails->description,
-            'alertName'       => $eventDetails->alertName,
-            'result'          => $eventDetails->result,
-            'notes'           => $eventDetails->notes,
+        $event[$event_details->id] = array (
+            'eventid'         => $event_details->id,
+            'characterID'     => $event_details->characterID,
+            'peopleGroupID'   => $this->characterPeopleGroup($event_details->characterID),
+            'description'     => $event_details->description,
+            'alertName'       => $event_details->alertName,
+            'result'          => $event_details->result,
+            'notes'           => $event_details->notes,
         );
         return View::make('security.details')
             ->with('event',$event);
@@ -174,12 +174,12 @@ class SecurityController extends BaseController {
     public function getView()
     {
 
-        $openEvents = \DB::table('security_events')
+        $open_events = \DB::table('security_events')
             ->join('security_alerts','security_alerts.alertID','=','security_events.alertID')
             ->where('result',0)
             ->get();
 
-        foreach ($openEvents as $row) {
+        foreach ($open_events as $row) {
 
             $events[$row->id] = array (
                 'eventid'         => $row->id,
@@ -204,7 +204,7 @@ class SecurityController extends BaseController {
 
     public function getSettings()
     {
-        $keywords = $eventDetails = \DB::table('security_keywords')->get();
+        $keywords = $event_details = \DB::table('security_keywords')->get();
 
         return View::make('security.settings')
             ->with('keywords',$keywords);

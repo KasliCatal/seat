@@ -31,7 +31,7 @@ use Seat\Jobs\Security\BaseSecurity;
 class UpdateEmployment extends BaseSecurity {
 
     public static function Update($keyID) {
-        $allianceCorporations=[];
+        $alliance_corporations=[];
         // Get the characters for this key
         $characters = BaseApi::findKeyCharacters($keyID);
         // Check if this key has any characters associated with it
@@ -39,35 +39,35 @@ class UpdateEmployment extends BaseSecurity {
             return;
 
         // Build an array with corpIDs for problematic alliances
-        foreach (\SecurityKeywords::where('security_keywords.type','alnc')->get() as $allianceKeywords ){
-            $memberCorporations = \DB::table('eve_alliancelist_membercorporations')
+        foreach (\SecurityKeywords::where('security_keywords.type','alnc')->get() as $alliance_keywords ){
+            $member_corporations = \DB::table('eve_alliancelist_membercorporations')
                 ->join('eve_alliancelist','eve_alliancelist_membercorporations.allianceid','=','eve_alliancelist.allianceid')
-                ->where('eve_alliancelist.name',$allianceKeywords->keyword)
+                ->where('eve_alliancelist.name',$alliance_keywords->keyword)
                 ->select('eve_alliancelist_membercorporations.corporationID')
                 ->get();
-            foreach($memberCorporations as $corporation){
-                array_push($allianceCorporations,$corporation->corporationID);
+            foreach($member_corporations as $corporation){
+                array_push($alliance_corporations,$corporation->corporationID);
             }
         }
 
         // loop through the characters associated with the key
-        foreach ($characters as $characterID) {
+        foreach ($characters as $character_id) {
             // loop through the employment history for the characterID
-            foreach (\EveEveCharacterInfoEmploymentHistory::where('characterID',$characterID)->get() as $employerID ){
+            foreach (\EveEveCharacterInfoEmploymentHistory::where('characterID',$character_id)->get() as $employer_id ){
                 // look for a match between the corpID from employment history and the corp blacklist
                 $match = \SecurityKeywords::where('security_keywords.type','corp')
-                    ->where('keyword','=',$employerID->corporationID)
+                    ->where('keyword','=',$employer_id->corporationID)
                     ->first();
 
                 /*
                 | if a match is found in the previous query, or the employer corpID is found in the alliance to
                 | corpID blacklist array then call the WriteEvent function with the associated details
                 */
-                if ($match || in_array($employerID->corporationID,$allianceCorporations) ){
-                    $hash = md5("$characterID$employerID->corporationID");
-                    $alertID = 3;
-                    $description = "$employerID->corporationID";
-                    BaseSecurity::WriteEvent($hash,$characterID,$alertID,$description);
+                if ($match || in_array($employer_id->corporationID,$alliance_corporations) ){
+                    $hash = md5("$character_id$employer_id->corporationID");
+                    $alert_id = 3;
+                    $description = "$employer_id->corporationID";
+                    BaseSecurity::WriteEvent($hash,$character_id,$alert_id,$description);
                     return $hash;
                 }
             }
