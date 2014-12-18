@@ -39,22 +39,22 @@ class UpdateContact extends BaseSecurity {
             return;
 
         // loop through the characters associated with the key
-        foreach ($characters as $characterID) {
+        foreach ($characters as $character_id) {
 
             // loop through all the contacts that are not corps/alliances
-            foreach (\EveCharacterContactList::where('characterID', '=', $characterID)->where('contactID','>',5000000)->get() as $contactID ){
+            foreach (\EveCharacterContactList::where('characterID', '=', $character_id)->where('contactID','>',5000000)->get() as $contact_id ){
 
                 //check is the character's contact is in the contact blacklist
                 $match = \SecurityKeywords::where('security_keywords.type','=','cnct')
-                    ->where('keyword','=',$contactID->contactName)
+                    ->where('keyword','=',$contact_id->contactName)
                     ->first();
 
                 // if the contact is in the blacklist add it to the security_events table
                 if ($match){
-                    $hash = md5("$characterID$contactID->contactName");
-                    $alertID = 4;
-                    $description = "$contactID->contactName";
-                    BaseSecurity::WriteEvent($hash,$characterID,$alertID,$description);
+                    $hash = md5("$character_id$contact_id->contactName");
+                    $alert_id = 4;
+                    $description = "$contact_id->contactName";
+                    BaseSecurity::WriteEvent($hash,$character_id,$alert_id,$description);
                     return $hash;
                 }
             }

@@ -36,22 +36,22 @@ class BaseSecurity {
     | if it does not exist creates a new entry.
     |
     */
-    public static function WriteEvent($hash,$characterID,$alertID,$description){
+    public static function WriteEvent($hash,$characterID,$alert_id,$description){
     	$checkhash = \SecurityEvents::where('hash','=',$hash)->first();
 
     	if(!$checkhash){
     		$date = new \DateTime;
-            $newEvent = new \SecurityEvents;
+            $event = new \SecurityEvents;
 
-            $newEvent->hash = $hash;
-	        $newEvent->result = 0;
-	        $newEvent->characterID = $characterID;
-	        $newEvent->alertID = $alertID;
-	        $newEvent->description = $description;
-	        $newEvent->created_at = $date;
-	        $newEvent->updated_at = $date;
-            $newEvent->save();
-    		return $newEvent;
+            $event->hash = $hash;
+	        $event->result = 0;
+	        $event->characterID = $characterID;
+	        $event->alertID = $alert_id;
+	        $event->description = $description;
+	        $event->created_at = $date;
+	        $event->updated_at = $date;
+            $event->save();
+    		return $event;
     	}
     }
 }
