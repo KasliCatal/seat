@@ -45,7 +45,7 @@ class SettingHelper
         'thousand_seperator' => ' ',
         'decimal_seperator' => '.',
         'required_mask' => 176693568,
-        'registration_enabled' => true,
+        'registration_enabled' => 1,
         'main_character_id' => 1,
         'main_character_name' => null
     );
