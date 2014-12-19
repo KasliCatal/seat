@@ -40,14 +40,32 @@ class SettingHelper
     */
 
     static $seat_defaults = array(
+
+        // Application Globals
         'app_name' => 'SeAT',
+        'required_mask' => 176693568,
+        'registration_enabled' => true,
+
+        // User personalization
         'color_scheme' => 'blue',
         'thousand_seperator' => ' ',
         'decimal_seperator' => '.',
         'required_mask' => 176693568,
         'registration_enabled' => 'true',
         'main_character_id' => 1,
-        'main_character_name' => null
+        'main_character_name' => null,
+
+        // SeAT Backend
+        'seatscheduled_character' => true,
+        'seatscheduled_corporation' => true,
+        'seatscheduled_corporation_assets' => true,
+        'seatscheduled_corporation_wallets' => true,
+        'seatscheduled_eve' => true,
+        'seatscheduled_map' => true,
+        'seatscheduled_server' => true,
+        'seatscheduled_notifications' => true,
+        'seatscheduled_queue_cleanup' => true
+
     );
 
     /*
@@ -103,29 +121,55 @@ class SettingHelper
                 // for user to have set.
                 if (in_array($setting_name, SettingHelper::$user_settings)) {
 
-                    // Looks like we have a user setting, lets do a
-                    // db lookup for it.
-                    $setting_value = \SeatUserSetting::where('user_id', \Auth::User()->id)
-                            ->where('setting', $setting_name)
-                            ->pluck('value');
+                    // If the database is not ready for us to attempt
+                    // setting retrieval, then the following call
+                    // will throw an exception. This can happen
+                    // with new installs when the application
+                    // bootstraps and wants things like the
+                    // app_name etc. So, to combat this,
+                    // we catch it and allow the flow
+                    // to follow down to the
+                    // defaults
+                    try {
 
-                    if($setting_value)
+                        // Looks like we have a user setting, lets do a
+                        // db lookup for it.
+                        $setting_value = \SeatUserSetting::where('user_id', \Auth::User()->id)
+                                ->where('setting', $setting_name)
+                                ->pluck('value');
 
-                        // Found the user setting, return that!
-                        return $setting_value;
+                        if($setting_value)
+
+                            // Found the user setting, return that!
+                            return $setting_value;
+
+                    } catch (\Exception $e) {}
                 }
             }
         }
 
-        // So we dont have a user setting for whatever reason,
-        // so lets check the SeAT global settings.
-        $setting_value = \SeatSetting::where('setting', $setting_name)
-                        ->pluck('value');
+        // If the database is not ready for us to attempt
+        // setting retrieval, then the following call
+        // will throw an exception. This can happen
+        // with new installs when the application
+        // bootstraps and wants things like the
+        // app_name etc. So, to combat this,
+        // we catch it and allow the flow
+        // to follow down to the
+        // defaults
+        try {
 
-        // If we have a database entry for the setting, return
-        // that as the value
-        if($setting_value)
-            return $setting_value;
+            // So we dont have a user setting for whatever reason,
+            // so lets check the SeAT global settings.
+            $setting_value = \SeatSetting::where('setting', $setting_name)
+                            ->pluck('value');
+
+            // If we have a database entry for the setting, return
+            // that as the value
+            if($setting_value)
+                return $setting_value;
+
+        } catch (\Exception $e) {}
 
         // Finally, and as a last resort, check if we have a
         // default value for this setting defined. If not

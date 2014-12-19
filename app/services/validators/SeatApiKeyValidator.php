@@ -25,24 +25,11 @@ SOFTWARE.
 
 namespace App\Services\Validators;
 
-class SettingValidator extends Validator
+class SeatApiKeyValidator extends Validator
 {
 
     public static $rules = array(
-        'app_name' => 'required',
-        'registration_enabled'  => 'required',
-        'required_mask'  => 'required|numeric|min:176693568',
-        'color_scheme'  => 'required|in:blue,black',
-        'thousand_seperator' => 'required',
-        'decimal_seperator' => 'required',
-        'seatscheduled_character' => 'required|in:true,false',
-        'seatscheduled_corporation' => 'required|in:true,false',
-        'seatscheduled_corporation_assets' => 'required|in:true,false',
-        'seatscheduled_corporation_wallets' => 'required|in:true,false',
-        'seatscheduled_eve' => 'required|in:true,false',
-        'seatscheduled_map' => 'required|in:true,false',
-        'seatscheduled_server' => 'required|in:true,false',
-        'seatscheduled_notifications' => 'required|in:true,false',
-        'seatscheduled_queue_cleanup' => 'required|in:true,false'
+        'keyID' => 'required|numeric',
+        'vCode'  => 'required|min:64'
     );
 }
