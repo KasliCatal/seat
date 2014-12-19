@@ -38,6 +38,6 @@ class SeatSettingSeeder extends Seeder
         SeatSetting::create(array('setting' => 'thousand_seperator', 'value' => ' '));
         SeatSetting::create(array('setting' => 'decimal_seperator', 'value' => '.'));
         SeatSetting::create(array('setting' => 'required_mask', 'value' => '176693568'));
-        SeatSetting::create(array('setting' => 'registration_enabled', 'value' => '1'));
+        SeatSetting::create(array('setting' => 'registration_enabled', 'value' => 'true'));
     }
 }
