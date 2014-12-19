@@ -31,7 +31,7 @@
                 <label class="col-md-4 control-label" for="prependedtext">Regisration Enabled</label>
                 <div class="col-md-6">
                   <div class="input-group">
-                    {{ Form::select('registration_enabled', array('1' => 'Yes', '0' => 'No'), $registration_enabled, array('class' => 'form-control')) }}
+                    {{ Form::select('registration_enabled', array('true' => 'Yes', 'false' => 'No'), $registration_enabled, array('class' => 'form-control')) }}
                     <span class="help-block">Are external parties allowed to register to your SeAT instance.</span>
                   </div>
                 </div>

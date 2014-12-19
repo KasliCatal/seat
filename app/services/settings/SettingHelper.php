@@ -43,7 +43,7 @@ class SettingHelper
         'app_name' => 'SeAT',
         'color_scheme' => 'blue',
         'required_mask' => 176693568,
-        'registration_enabled' => 1,
+        'registration_enabled' => 'true',
         'main_character_id' => 1,
         'main_character_name' => null
     );
