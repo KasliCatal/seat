@@ -1,5 +1,7 @@
 <?php
 
+use Pheal\Pheal;
+
 class SecurityController extends BaseController {
 
     public function __construct()
