@@ -30,7 +30,11 @@
               @foreach($keywords as $keyword)
 
                 <tr>
-                  <td>{{ $keyword->keyword }}</td>
+                  @if($keyword->type == 'corp')
+                    <td><span rel="id-to-name">{{ $keyword->keyword }}</span></td>
+                  @else
+                    <td>{{ $keyword->keyword }}</td>
+                  @endif
                   <td>{{ $keyword->type }}</td>
                   <td>
                     <a href="{{ action('SecurityController@getDeleteKeyword', array('keyword' => $keyword->id, '')) }}" class="btn btn-danger btn-xs"><i class="fa fa-trash"></i> Delete Keyword</a>
@@ -46,7 +50,7 @@
     </div>
   </div>
 
-  <!-- password reveal modal -->
+  <!-- add keyword modal -->
   <div class="modal fade" id="addKeywordModal" tabindex="-1" role="dialog" aria-hidden="true">
     <div class="modal-dialog">
       <div class="modal-content">
@@ -85,4 +89,47 @@
 @stop
 
 @section('javascript')
+<script type="text/javascript" id="js">
+  // Events to be triggered when the ajax calls have completed.
+  $( document ).ajaxComplete(function() {
+
+    // Update any outstanding id-to-name fields
+    var items = [];
+    var arrays = [], size = 250;
+
+    $('[rel="id-to-name"]').each( function(){
+      //add item to array
+      if ($.isNumeric($(this).text())) {
+        items.push( $(this).text() );
+      }
+    });
+
+    var items = $.unique( items );
+
+    while (items.length > 0)
+      arrays.push(items.splice(0, size));
+
+    $.each(arrays, function( index, value ) {
+
+      $.ajax({
+        type: 'POST',
+        url: "{{ action('HelperController@postResolveNames') }}",
+        data: {
+          'ids': value.join(',')
+        },
+        success: function(result){
+          $.each(result, function(id, name) {
+
+            $("span:contains('" + id + "')").html(name);
+          })
+        },
+        error: function(xhr, textStatus, errorThrown){
+          console.log(xhr);
+          console.log(textStatus);
+          console.log(errorThrown);
+        }
+      });
+    });
+  });
+</script>
 @stop

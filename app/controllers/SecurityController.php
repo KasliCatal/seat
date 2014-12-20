@@ -242,6 +242,16 @@ class SecurityController extends BaseController {
     {
         $newword = htmlspecialchars(Input::get('newword'));
         $type    = htmlspecialchars(Input::get('type'));
+
+        // Try to get a corp ID for the name, if it isn't found return an error
+        if ($type == 'corp'){
+            $newword = getCorporationID($newword);
+            if (!is_numeric($newword) ){
+                return Redirect::action('SecurityController@getSettings')
+                    ->withErrors($newword);
+            }
+        }
+
         $keyword = new \SecurityKeywords;
         $keyword->keyword = $newword;
         $keyword->type    = $type;
@@ -249,5 +259,32 @@ class SecurityController extends BaseController {
 
         return Redirect::action('SecurityController@getSettings')
             ->with('success', 'Keyword "' . $newword . '" Added');
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | getCorporationID()
+    |--------------------------------------------------------------------------
+    |
+    | Get the corporationID for a give name
+    |
+    */
+
+    public function getCorporationID($corporation_name)
+    {
+        $pheal = new Pheal();
+
+        try {
+            $corporation = $pheal->CharacterID(array("names" => $corporation_name));
+        } catch (\Pheal\Exceptions\PhealException $e) {
+            throw $e;
+        }
+
+        if ( $corporation->characterID ){
+            return $corporation->characterID;
+        }else{
+            return "$corporation_name Not Found";
+        }
+
     }
 }
