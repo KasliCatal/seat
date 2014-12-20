@@ -245,7 +245,7 @@ class SecurityController extends BaseController {
 
         // Try to get a corp ID for the name, if it isn't found return an error
         if ($type == 'corp'){
-            $newword = getCorporationID($newword);
+            $newword = $this->getCorporationID($newword);
             if (!is_numeric($newword) ){
                 return Redirect::action('SecurityController@getSettings')
                     ->withErrors($newword);
