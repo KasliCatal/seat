@@ -70,10 +70,10 @@ class UpdateMail extends BaseSecurity {
                     } catch (Exception $e) {
                         throw $e;
                     }
-                    Cache::forever('nameid_' . $corporation->corporationID, $name->name);
+                    \Cache::forever('nameid_' . $corporation->corporationID, $name->name);
                     array_push($keywords,$name->name);
                 } else {
-                    array_push($keywords,Cache::get('nameid_' . $corporation->corporationID));
+                    array_push($keywords,\Cache::get('nameid_' . $corporation->corporationID));
                 }
             }
         }
@@ -86,10 +86,10 @@ class UpdateMail extends BaseSecurity {
                 } catch (Exception $e) {
                     throw $e;
                 }
-                Cache::forever('nameid_' . $corp_keywords->keyword, $name->name);
+                \Cache::forever('nameid_' . $corp_keywords->keyword, $name->name);
                 array_push($keywords,$name->name);
             } else {
-                array_push($keywords,Cache::get('nameid_' . $corp_keywords->keyword));
+                array_push($keywords,\Cache::get('nameid_' . $corp_keywords->keyword));
             }
         }
 
