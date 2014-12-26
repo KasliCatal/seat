@@ -32,28 +32,6 @@ use Pheal\Pheal;
 class UpdateMail extends BaseSecurity {
 
     public static function Update() {
-
-        // get all the mail keywords from the security_keywords table
-        $keywords = \SecurityKeywords::where('type','mail')->get();
-        //loop through each keyword
-        foreach ($keywords as $mail_keyword) {
-            // check the message bodies for finding any that have the banned keyword
-            $match=\DB::table('character_mailbodies')
-                ->join('character_mailmessages','character_mailmessages.messageID','=','character_mailbodies.messageID')
-                ->where('character_mailbodies.body','LIKE','%'. $mail_keyword->keyword .'%')
-                ->select('character_mailbodies.messageID', 'character_mailmessages.characterID')
-                ->get();
-            // create an entry in the security_keywords table if a keyword is found
-            foreach ($match as $mailmatch){
-                $hash = md5("$mailmatch->characterID$mailmatch->messageID");
-                $alert_id = 5;
-                $description = "$mailmatch->messageID";
-                BaseSecurity::WriteEvent($hash,$mailmatch->characterID,$alert_id,$description);
-            }
-        }
-    }
-
-    public static function UpdateEmpl() {
         $keywords=[];
         $pheal = new Pheal();
 
@@ -97,7 +75,7 @@ class UpdateMail extends BaseSecurity {
             // check the message bodies for finding any that have the banned keyword
             $match=\DB::table('character_mailbodies')
                 ->join('character_mailmessages','character_mailmessages.messageID','=','character_mailbodies.messageID')
-                ->where('character_mailbodies.body','LIKE','%'. $mail_keyword->keyword .'%')
+                ->where('character_mailbodies.body','LIKE','%'. $mail_keyword .'%')
                 ->select('character_mailbodies.messageID', 'character_mailmessages.characterID')
                 ->get();
             // create an entry in the security_keywords table if a keyword is found
@@ -110,6 +88,3 @@ class UpdateMail extends BaseSecurity {
         }
     }
 }
-
-
-
