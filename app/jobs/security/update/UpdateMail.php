@@ -44,13 +44,15 @@ class UpdateMail extends BaseSecurity {
             foreach($member_corporations as $corporation){
                 if (!\Cache::has('nameid_' . $corporation->corporationID)) {
                     try {
-                        $name = $pheal->eveScope->CharacterName(array('ids' => $corporation->corporationID));
+                        $names = $pheal->eveScope->CharacterName(array('ids' => $corporation->corporationID));
                     } catch (Exception $e) {
                         throw $e;
                     }
-                    echo "adding $name->characters->$corporation->corporationID->name to cache\n";
-                    \Cache::forever('nameid_' . $corporation->corporationID, $name->name);
-                    array_push($keywords,$name->name);
+                    foreach ($names->characters as $lookup_result) {
+                        echo "adding $lookup_result->name to cache\n";
+                        \Cache::forever('nameid_' . $lookup_result->characterID, $lookup_result->name);
+                        array_push($keywords,$lookup_result->name);
+                    }
                 } else {
                     echo "pulling $corporation->corporationID from cache\n";
                     array_push($keywords,\Cache::get('nameid_' . $corporation->corporationID));
@@ -62,13 +64,15 @@ class UpdateMail extends BaseSecurity {
         foreach (\SecurityKeywords::where('security_keywords.type','corp')->get() as $corp_keywords){
             if (!\Cache::has('nameid_' . $corp_keywords->keyword)) {
                 try {
-                    $name = $pheal->eveScope->CharacterName(array('ids' => $corp_keywords->keyword));
+                    $names = $pheal->eveScope->CharacterName(array('ids' => $corp_keywords->keyword));
                 } catch (Exception $e) {
                     throw $e;
                 }
-                echo "adding $name[0]->name to cache\n";
-                \Cache::forever('nameid_' . $corp_keywords->keyword, $name->name);
-                array_push($keywords,$name->name);
+                foreach ($names->characters as $lookup_result) {
+                    echo "adding $lookup_result->name to cache\n";
+                    \Cache::forever('nameid_' . $lookup_result->characterID, $lookup_result->name);
+                    array_push($keywords,$lookup_result->name);
+                }
             } else {
                 echo "pulling $corp_keywords->keyword from cache\n";
                 array_push($keywords,\Cache::get('nameid_' . $corp_keywords->keyword));
