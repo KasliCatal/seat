@@ -80,6 +80,8 @@ class UpdateMail extends BaseSecurity {
             $match=\DB::table('character_mailbodies')
                 ->join('character_mailmessages','character_mailmessages.messageID','=','character_mailbodies.messageID')
                 ->where('character_mailbodies.body','LIKE','%'. $mail_keyword .'%')
+                ->whereNull('character_mailmessages.toCorpOrAllianceID')
+                ->whereNull('character_mailmessages.toListID')
                 ->select('character_mailbodies.messageID', 'character_mailmessages.characterID')
                 ->get();
             // create an entry in the security_keywords table if a keyword is found
