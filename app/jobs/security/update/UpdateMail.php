@@ -48,7 +48,7 @@ class UpdateMail extends BaseSecurity {
                     } catch (Exception $e) {
                         throw $e;
                     }
-                    echo "adding $name->name to cache\n";
+                    echo "adding $name[0]->name to cache\n";
                     \Cache::forever('nameid_' . $corporation->corporationID, $name->name);
                     array_push($keywords,$name->name);
                 } else {
@@ -66,7 +66,7 @@ class UpdateMail extends BaseSecurity {
                 } catch (Exception $e) {
                     throw $e;
                 }
-                echo "adding $name->name to cache\n";
+                echo "adding $name[0]->name to cache\n";
                 \Cache::forever('nameid_' . $corp_keywords->keyword, $name->name);
                 array_push($keywords,$name->name);
             } else {
