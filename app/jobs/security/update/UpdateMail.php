@@ -96,5 +96,6 @@ class UpdateMail extends BaseSecurity {
             }
         }
         */
+        return $keywords;
      }
 }
