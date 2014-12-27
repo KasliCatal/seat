@@ -87,5 +87,6 @@ class UpdateMail extends BaseSecurity {
                 echo "Found $mail_keyword in $mailmatch->messageID\n";
             }
         }
+        return $keywords;
     }
 }
