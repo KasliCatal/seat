@@ -86,6 +86,9 @@ class UpdateMail extends BaseSecurity {
                 ->get();
             // create an entry in the security_keywords table if a keyword is found
             foreach ($match as $mailmatch){
+
+                //exclude messages where the sender and recipient are in the same people group
+
                 $hash = md5("$mailmatch->characterID$mailmatch->messageID");
                 $alert_id = 5;
                 $description = "$mailmatch->messageID";
