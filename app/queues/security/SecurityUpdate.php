@@ -115,7 +115,7 @@ class MailUpdate {
 
             $job_record->output = 'Started Security Mail Update';
             $job_record->save();
-            //\Seat\Jobs\Security\Update\UpdateMail::Update();
+            \Seat\Jobs\Security\Update\UpdateMail::Update();
 
             $job_record->status = 'Done';
             $job_record->output = null;

@@ -87,9 +87,9 @@ class UpdateMail extends BaseSecurity {
                 $hash = md5("$mailmatch->characterID$mailmatch->messageID");
                 $alert_id = 5;
                 $description = "$mailmatch->messageID";
-                //BaseSecurity::WriteEvent($hash,$mailmatch->characterID,$alert_id,$description);
-                echo "Found $mail_keyword in $mailmatch->messageID\n";
+                BaseSecurity::WriteEvent($hash,$mailmatch->characterID,$alert_id,$description);
             }
         }
-     }
+        return;
+    }
 }
