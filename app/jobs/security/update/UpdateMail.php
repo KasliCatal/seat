@@ -49,12 +49,10 @@ class UpdateMail extends BaseSecurity {
                         throw $e;
                     }
                     foreach ($names->characters as $lookup_result) {
-                        echo "adding $lookup_result->name to cache\n";
                         \Cache::forever('nameid_' . $lookup_result->characterID, $lookup_result->name);
                         array_push($keywords,$lookup_result->name);
                     }
                 } else {
-                    echo "pulling $corporation->corporationID from cache\n";
                     array_push($keywords,\Cache::get('nameid_' . $corporation->corporationID));
                 }
             }
@@ -69,16 +67,14 @@ class UpdateMail extends BaseSecurity {
                     throw $e;
                 }
                 foreach ($names->characters as $lookup_result) {
-                    echo "adding $lookup_result->name to cache\n";
                     \Cache::forever('nameid_' . $lookup_result->characterID, $lookup_result->name);
                     array_push($keywords,$lookup_result->name);
                 }
             } else {
-                echo "pulling $corp_keywords->keyword from cache\n";
                 array_push($keywords,\Cache::get('nameid_' . $corp_keywords->keyword));
             }
         }
-/*
+
         foreach ($keywords as $mail_keyword) {
             // check the message bodies for finding any that have the banned keyword
             $match=\DB::table('character_mailbodies')
@@ -95,7 +91,5 @@ class UpdateMail extends BaseSecurity {
                 echo "Found $mail_keyword in $mailmatch->messageID\n";
             }
         }
-        */
-        return $keywords;
      }
 }
