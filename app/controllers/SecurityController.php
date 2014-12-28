@@ -73,40 +73,44 @@ class SecurityController extends BaseController {
 
     public function postFindEvents()
     {
-        $search_criteria = Input::get('search_criteria');
-        if ($search_criteria == '')
-            return Redirect::action('SecurityController@getView');
+        if(\Auth::hasAccess('recruiter')) {
+            $search_criteria = Input::get('search_criteria');
+            if ($search_criteria == '')
+                return Redirect::action('SecurityController@getView');
 
-        $search_criteria = htmlspecialchars($search_criteria);
+            $search_criteria = htmlspecialchars($search_criteria);
 
-        $search_characters = DB::table('security_events')
-            ->join('eve_characterinfo','eve_characterinfo.characterID','=','security_events.characterID')
-            ->join('security_alerts','security_alerts.alertID','=','security_events.alertID')
-            ->where('eve_characterinfo.characterName','like',"%$search_criteria%")
-            ->select('security_events.*', 'security_alerts.alertName');
-        $search_events = DB::table('security_events')
-            ->join('security_alerts','security_alerts.alertID','=','security_events.alertID')
-            ->where('id',$search_criteria)
-            ->select('security_events.*', 'security_alerts.alertName')
-            ->union($search_characters)
-            ->get();
-        if ($search_events){
+            $search_characters = DB::table('security_events')
+                ->join('eve_characterinfo','eve_characterinfo.characterID','=','security_events.characterID')
+                ->join('security_alerts','security_alerts.alertID','=','security_events.alertID')
+                ->where('eve_characterinfo.characterName','like',"%$search_criteria%")
+                ->select('security_events.*', 'security_alerts.alertName');
+            $search_events = DB::table('security_events')
+                ->join('security_alerts','security_alerts.alertID','=','security_events.alertID')
+                ->where('id',$search_criteria)
+                ->select('security_events.*', 'security_alerts.alertName')
+                ->union($search_characters)
+                ->get();
+            if ($search_events){
 
-            foreach ($search_events as $row) {
+                foreach ($search_events as $row) {
 
-                $events[$row->id] = array (
-                    'eventid'         => $row->id,
-                    'characterID'     => $row->characterID,
-                    'peopleGroupID'   => $this->characterPeopleGroup($row->characterID),
-                    'description'     => $row->description,
-                    'alertName'       => $row->alertName
-                );
+                    $events[$row->id] = array (
+                        'eventid'         => $row->id,
+                        'characterID'     => $row->characterID,
+                        'peopleGroupID'   => $this->characterPeopleGroup($row->characterID),
+                        'description'     => $row->description,
+                        'alertName'       => $row->alertName
+                    );
+                }
+                return View::make('security.view')
+                    ->with('events',$events);
             }
-            return View::make('security.view')
-                ->with('events',$events);
-        }
 
-        return Redirect::action('SecurityController@getView');
+            return Redirect::action('SecurityController@getView');
+        }else{
+            App::abort(404);
+        }
     }
 
     /*
@@ -146,22 +150,26 @@ class SecurityController extends BaseController {
 
     public function getDetails($eventid)
     {
-        $eventid = htmlspecialchars($eventid);
-        $event_details = \DB::table('security_events')
-            ->join('security_alerts','security_alerts.alertID','=','security_events.alertID')
-            ->where('id',$eventid)
-            ->first();
-        $event[$event_details->id] = array (
-            'eventid'         => $event_details->id,
-            'characterID'     => $event_details->characterID,
-            'peopleGroupID'   => $this->characterPeopleGroup($event_details->characterID),
-            'description'     => $event_details->description,
-            'alertName'       => $event_details->alertName,
-            'result'          => $event_details->result,
-            'notes'           => $event_details->notes,
-        );
-        return View::make('security.details')
-            ->with('event',$event);
+        if(\Auth::hasAccess('recruiter')) {
+            $eventid = htmlspecialchars($eventid);
+            $event_details = \DB::table('security_events')
+                ->join('security_alerts','security_alerts.alertID','=','security_events.alertID')
+                ->where('id',$eventid)
+                ->first();
+            $event[$event_details->id] = array (
+                'eventid'         => $event_details->id,
+                'characterID'     => $event_details->characterID,
+                'peopleGroupID'   => $this->characterPeopleGroup($event_details->characterID),
+                'description'     => $event_details->description,
+                'alertName'       => $event_details->alertName,
+                'result'          => $event_details->result,
+                'notes'           => $event_details->notes,
+            );
+            return View::make('security.details')
+                ->with('event',$event);
+        }else{
+            App::abort(404);
+        }
     }
 
     /*
@@ -175,24 +183,27 @@ class SecurityController extends BaseController {
 
     public function getView()
     {
+        if(\Auth::hasAccess('recruiter')) {
+            $open_events = \DB::table('security_events')
+                ->join('security_alerts','security_alerts.alertID','=','security_events.alertID')
+                ->where('result',0)
+                ->get();
 
-        $open_events = \DB::table('security_events')
-            ->join('security_alerts','security_alerts.alertID','=','security_events.alertID')
-            ->where('result',0)
-            ->get();
+            foreach ($open_events as $row) {
 
-        foreach ($open_events as $row) {
-
-            $events[$row->id] = array (
-                'eventid'         => $row->id,
-                'characterID'     => $row->characterID,
-                'peopleGroupID'   => $this->characterPeopleGroup($row->characterID),
-                'description'     => $row->description,
-                'alertName'       => $row->alertName
-            );
+                $events[$row->id] = array (
+                    'eventid'         => $row->id,
+                    'characterID'     => $row->characterID,
+                    'peopleGroupID'   => $this->characterPeopleGroup($row->characterID),
+                    'description'     => $row->description,
+                    'alertName'       => $row->alertName
+                );
+            }
+            return View::make('security.view')
+                ->with('events',$events);
+        }else{
+            App::abort(404);
         }
-        return View::make('security.view')
-            ->with('events',$events);
     }
 
     /*
@@ -206,10 +217,14 @@ class SecurityController extends BaseController {
 
     public function getSettings()
     {
-        $keywords = $event_details = \DB::table('security_keywords')->get();
+        if(\Auth::hasAccess('recruiter')) {
+            $keywords = $event_details = \DB::table('security_keywords')->get();
 
-        return View::make('security.settings')
-            ->with('keywords',$keywords);
+            return View::make('security.settings')
+                ->with('keywords',$keywords);
+        }else{
+            App::abort(404);
+        }
     }
 
     /*
@@ -223,12 +238,16 @@ class SecurityController extends BaseController {
 
     public function getDeleteKeyword($keywordID)
     {
-        $keyword = \SecurityKeywords::find($keywordID);
+        if(\Auth::hasAccess('recruiter')) {
+            $keyword = \SecurityKeywords::find($keywordID);
 
-        $keyword->delete();
+            $keyword->delete();
 
-        return Redirect::action('SecurityController@getSettings')
-            ->with('success', 'Keyword "' . $keyword->keyword . '" Deleted');
+            return Redirect::action('SecurityController@getSettings')
+                ->with('success', 'Keyword "' . $keyword->keyword . '" Deleted');
+        }else{
+            App::abort(404);
+        }
     }
 
     /*
@@ -242,25 +261,29 @@ class SecurityController extends BaseController {
 
     public function postAddKeyword()
     {
-        $newword = htmlspecialchars(Input::get('newword'));
-        $type    = htmlspecialchars(Input::get('type'));
+        if(\Auth::hasAccess('recruiter')) {
+            $newword = htmlspecialchars(Input::get('newword'));
+            $type    = htmlspecialchars(Input::get('type'));
 
-        // Try to get a corp ID for the name, if it isn't found return an error
-        if ($type == 'corp'){
-            $newword = $this->getCorporationID($newword);
-            if (!is_numeric($newword) ){
-                return Redirect::action('SecurityController@getSettings')
-                    ->withErrors($newword);
+            // Try to get a corp ID for the name, if it isn't found return an error
+            if ($type == 'corp'){
+                $newword = $this->getCorporationID($newword);
+                if (!is_numeric($newword) ){
+                    return Redirect::action('SecurityController@getSettings')
+                        ->withErrors($newword);
+                }
             }
+
+            $keyword = new \SecurityKeywords;
+            $keyword->keyword = $newword;
+            $keyword->type    = $type;
+            $keyword->save();
+
+            return Redirect::action('SecurityController@getSettings')
+                ->with('success', 'Keyword "' . $newword . '" Added');
+        }else{
+            App::abort(404);
         }
-
-        $keyword = new \SecurityKeywords;
-        $keyword->keyword = $newword;
-        $keyword->type    = $type;
-        $keyword->save();
-
-        return Redirect::action('SecurityController@getSettings')
-            ->with('success', 'Keyword "' . $newword . '" Added');
     }
 
     /*
