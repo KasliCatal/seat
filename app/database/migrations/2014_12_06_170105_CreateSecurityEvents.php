@@ -16,12 +16,13 @@ class CreateSecurityEvents extends Migration {
 		{
 			$table->increments('id');
 
-			$table->text('description');
+			$table->integer('item_id');
 			$table->integer('result');
 
 			$table->integer('characterID');
 			$table->text('updated_by');
 			$table->integer('alertID');
+			$table->text('details');
 			$table->text('notes');
 			$table->char('hash',32);
 

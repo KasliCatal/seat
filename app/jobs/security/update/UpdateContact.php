@@ -53,8 +53,9 @@ class UpdateContact extends BaseSecurity {
                 if ($match){
                     $hash = md5("$character_id$contact_id->contactName");
                     $alert_id = 4;
-                    $description = "$contact_id->contactName";
-                    BaseSecurity::WriteEvent($hash,$character_id,$alert_id,$description);
+                    $item_id = "$contact_id->contactName";
+                    $details = "$contact_id->contactName";
+                    BaseSecurity::WriteEvent($hash,$character_id,$alert_id,$item_id,$details);
                     return $hash;
                 }
             }

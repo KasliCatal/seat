@@ -99,7 +99,8 @@ class SecurityController extends BaseController {
                         'eventid'         => $row->id,
                         'characterID'     => $row->characterID,
                         'peopleGroupID'   => $this->characterPeopleGroup($row->characterID),
-                        'description'     => $row->description,
+                        'itemID'          => $row->itemID,
+                        'details'         => $row->details,
                         'alertName'       => $row->alertName
                     );
                 }
@@ -160,7 +161,8 @@ class SecurityController extends BaseController {
                 'eventid'         => $event_details->id,
                 'characterID'     => $event_details->characterID,
                 'peopleGroupID'   => $this->characterPeopleGroup($event_details->characterID),
-                'description'     => $event_details->description,
+                'itemID'          => $row->itemID,
+                'details'         => $row->details,
                 'alertName'       => $event_details->alertName,
                 'result'          => $event_details->result,
                 'notes'           => $event_details->notes,
@@ -192,10 +194,11 @@ class SecurityController extends BaseController {
             foreach ($open_events as $row) {
 
                 $events[$row->id] = array (
-                    'eventid'         => $row->id,
+                    'eventID'         => $row->id,
                     'characterID'     => $row->characterID,
                     'peopleGroupID'   => $this->characterPeopleGroup($row->characterID),
-                    'description'     => $row->description,
+                    'itemID'          => $row->itemID,
+                    'details'         => $row->details,
                     'alertName'       => $row->alertName
                 );
             }

@@ -66,8 +66,9 @@ class UpdateEmployment extends BaseSecurity {
                 if ($match || in_array($employer_id->corporationID,$alliance_corporations) ){
                     $hash = md5("$character_id$employer_id->corporationID");
                     $alert_id = 3;
-                    $description = "$employer_id->corporationID";
-                    BaseSecurity::WriteEvent($hash,$character_id,$alert_id,$description);
+                    $item_id = "$employer_id->corporationID";
+                    $details = "$employer_id->corporationID";
+                    BaseSecurity::WriteEvent($hash,$character_id,$alert_id,$item_id,$details);
                     return $hash;
                 }
             }

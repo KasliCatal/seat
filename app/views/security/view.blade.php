@@ -46,7 +46,7 @@
                 <th>Character</th>
                 <th>People Group</th>
                 <th>Alert Type</th>
-                <th>Description</th>
+                <th>Item</th>
                 <th></th>
               </tr>
             </thead>
@@ -65,10 +65,10 @@
                   <td>{{ $event['alertName'] }}</td>
                   @if($event['alertName'] == 'Mail')
                     <td>
-                      <a href="{{ action('MailController@getRead', array('messageID' => $event['description'])) }}">Read Message: {{ $event['description'] }}</a>
+                      <a href="{{ action('MailController@getRead', array('messageID' => $event['itemID'])) }}">Flagged: {{ $event['details'] }} </a>
                     </td>
                   @else
-                    <td><span rel="id-to-name">{{ $event['description'] }}</span></td>
+                    <td><span rel="id-to-name">{{ $event['itemID'] }}</span></td>
                   @endif
                   <td>
                     <a href="{{ action('SecurityController@getDetails', array('eventid' => $event['eventid'])) }}"  data-target="#detailModal" data-toggle="modal"class="btn btn-info btn-xs"><i class="fa fa-desktop"></i> Edit Details</a>

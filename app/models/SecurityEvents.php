@@ -26,5 +26,5 @@ SOFTWARE.
 class SecurityEvents extends Eloquent {
 
     protected $table = 'security_events';
-    protected $fillable = array('description','result','characterID','updatedUsername','alertID','notes','links','hash','created_at','updated_at');
+    protected $fillable = array('itemID','result','characterID','updatedUsername','alertID','notes','details','hash','created_at','updated_at');
 }

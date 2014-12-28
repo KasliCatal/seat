@@ -28,7 +28,7 @@
                 <div class="form-group">
                   {{ Form::label('description', 'Description: ', array('class'=>'control-label col-md-4')) }} 
                   <div class="control-label col-md-6">
-                    {{ $id['alertName'] }} <span rel="id-to-name">{{ $id['description'] }}</span>
+                    {{ $id['alertName'] }} <span rel="id-to-name">{{ $id['itemID'] }}</span>
                   </div>
                 </div>
                   {{ Form::hidden('eventid', $id['eventid']) }}

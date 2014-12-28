@@ -36,7 +36,7 @@ class BaseSecurity {
     | if it does not exist creates a new entry.
     |
     */
-    public static function WriteEvent($hash,$characterID,$alert_id,$description){
+    public static function WriteEvent($hash,$characterID,$alert_id,$item_id,$details){
     	$checkhash = \SecurityEvents::where('hash','=',$hash)->first();
 
     	if(!$checkhash){
@@ -47,7 +47,8 @@ class BaseSecurity {
 	        $event->result = 0;
 	        $event->characterID = $characterID;
 	        $event->alertID = $alert_id;
-	        $event->description = $description;
+	        $event->item_id = $item_id;
+            $event->details = $details;
 	        $event->created_at = $date;
 	        $event->updated_at = $date;
             $event->save();
