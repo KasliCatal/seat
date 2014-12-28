@@ -592,6 +592,8 @@ class CharacterController extends BaseController
         // Get the contact list
         $contact_list = DB::table('character_contactlist')
             ->where('characterID', $characterID)
+            ->where('contactID','>','4000000')
+            ->where('contactID','<','2100000000')
             ->get();
 
         // Finally, give all this to the view to handle
