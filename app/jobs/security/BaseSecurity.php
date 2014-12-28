@@ -47,7 +47,7 @@ class BaseSecurity {
 	        $event->result = 0;
 	        $event->characterID = $characterID;
 	        $event->alertID = $alert_id;
-	        $event->item_id = $item_id;
+	        $event->itemID = $item_id;
             $event->details = $details;
 	        $event->created_at = $date;
 	        $event->updated_at = $date;
