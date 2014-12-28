@@ -194,7 +194,7 @@ class SecurityController extends BaseController {
             foreach ($open_events as $row) {
 
                 $events[$row->id] = array (
-                    'eventID'         => $row->id,
+                    'eventid'         => $row->id,
                     'characterID'     => $row->characterID,
                     'peopleGroupID'   => $this->characterPeopleGroup($row->characterID),
                     'itemID'          => $row->itemID,
