@@ -90,7 +90,7 @@ class UpdateMail extends BaseSecurity {
                 //exclude messages where the sender and recipient are in the same people group
                 $to_character_ids = preg_split("/,/", $mailmatch->toCharacterIDs);
                 foreach ($to_character_ids as $to_character_id) {
-                    if ( BaseSecurity::characterPeopleGroup($to_character_id) <> BaseSecurity::characterPeopleGroup($mailmatch->CharacterID)) {
+                    if ( BaseSecurity::characterPeopleGroup($to_character_id) <> BaseSecurity::characterPeopleGroup($mailmatch->characterID)) {
                         $hash = md5("$mailmatch->characterID$mailmatch->messageID");
                         $alert_id = 5;
                         $item_id = "$mailmatch->messageID";
