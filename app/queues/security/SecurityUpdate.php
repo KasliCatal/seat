@@ -65,6 +65,10 @@ class CharacterUpdate {
             $job_record->save();
             \Seat\Jobs\Security\Update\UpdateContact::Update($keyID);
 
+            $job_record->output = 'Started Security Wallet Journal Update';
+            $job_record->save();
+            \Seat\Jobs\Security\Update\UpdateWallet::Update($keyID);
+
     		$job_record->status = 'Done';
             $job_record->output = null;
     		$job_record->save();
