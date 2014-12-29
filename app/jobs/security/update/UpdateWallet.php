@@ -47,15 +47,11 @@ class UpdateWallet extends BaseSecurity {
                       ->orWhereBetween('refTypeID',array(63,84));
             })
             ->get() as $wallet_journal){
-
-                foreach ($wallet_journal as $wallet_event) {
-                    $hash = md5("$character_id$wallet_event->refID");
-                    $alert_id = 7;
-                    $item_id = "$wallet_event->refID";
-                    $details = "$wallet_event->refID";
-                    BaseSecurity::WriteEvent($hash,$character_id,$alert_id,$item_id,$details);
-                    return $hash;
-                }
+                $hash = md5("$character_id$wallet_journal->refID");
+                $alert_id = 7;
+                $item_id = "$wallet_journal->refID";
+                $details = "Between $wallet_journal->ownerName1 and $wallet_journal->ownerName2";
+                BaseSecurity::WriteEvent($hash,$character_id,$alert_id,$item_id,$details);
             }
         }
         return;

@@ -72,7 +72,7 @@
                   @elseif($event['alertName'] == 'Wallet Journal > 500m')
                     <td>
                       <a href="{{ action('CharacterController@getFullWalletJournal', array('characterID' => $event['characterID'])) }}" class="btn btn-default btn-sm">
-                        <i class="fa fa-money"></i> View Full Journal
+                        <i class="fa fa-money"></i> {{ $event['details'] }}
                       </a>
                     </td>
                   @else
