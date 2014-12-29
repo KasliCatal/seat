@@ -58,7 +58,7 @@ class SecurityController extends BaseController {
                 'updated_by' => $updated_by,
                 'updated_at' => $date));
 
-        return;
+        return Redirect::action('SecurityController@getView');
     }
 
     /*
