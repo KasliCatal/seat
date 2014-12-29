@@ -82,18 +82,22 @@ class UpdateMail extends BaseSecurity {
                 ->where('character_mailbodies.body','LIKE','%'. $mail_keyword .'%')
                 ->whereNull('character_mailmessages.toCorpOrAllianceID')
                 ->whereNull('character_mailmessages.toListID')
-                ->select('character_mailbodies.messageID', 'character_mailmessages.characterID')
+                ->select('character_mailbodies.messageID', 'character_mailmessages.characterID', 'character_mailmessages.toCharacterIDs')
                 ->get();
             // create an entry in the security_keywords table if a keyword is found
             foreach ($match as $mailmatch){
 
                 //exclude messages where the sender and recipient are in the same people group
-
-                $hash = md5("$mailmatch->characterID$mailmatch->messageID");
-                $alert_id = 5;
-                $item_id = "$mailmatch->messageID";
-                $details = "$mail_keyword";
-                BaseSecurity::WriteEvent($hash,$mailmatch->characterID,$alert_id,$item_id,$details);
+                $to_character_ids = preg_split("/,/", $mailmatch->toCharacterIDs);
+                foreach ($to_character_ids as $to_character_id) {
+                    if ( BaseSecurity::characterPeopleGroup($to_character_id) <> BaseSecurity::characterPeopleGroup($mailmatch->CharacterID)) {
+                        $hash = md5("$mailmatch->characterID$mailmatch->messageID");
+                        $alert_id = 5;
+                        $item_id = "$mailmatch->messageID";
+                        $details = "$mail_keyword";
+                        BaseSecurity::WriteEvent($hash,$mailmatch->characterID,$alert_id,$item_id,$details);
+                    }
+                }
             }
         }
         return;
