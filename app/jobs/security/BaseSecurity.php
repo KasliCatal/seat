@@ -56,7 +56,7 @@ class BaseSecurity {
     	}
     }
 
-    public function characterPeopleGroup($characterID)
+    public static function characterPeopleGroup($characterID)
     {
         $character_people_group = DB::table('seat_people_main')
                 ->join('seat_people','seat_people_main.personID','=','seat_people.personID')
