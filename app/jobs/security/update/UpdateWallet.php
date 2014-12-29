@@ -27,8 +27,37 @@ namespace Seat\Jobs\Security\Update;
 
 use Seat\EveApi\BaseApi;
 use Seat\Jobs\Security\BaseSecurity;
-use Pheal\Pheal;
 
 class UpdateWallet extends BaseSecurity {
-	// flag transactions 500M and up
+    public static function Update($keyID)
+    {
+        // Get the characters for this key
+        $characters = BaseApi::findKeyCharacters($keyID);
+        // Check if this key has any characters associated with it
+        if (!$characters)
+            return;
+        // loop through the characters associated with the key
+        foreach ($characters as $character_id) {
+
+            // loop through the wallet journal for the char looking for flagable issues
+            foreach (\EveCharacterWalletJournal::where('characterID',$character_id)->where('amount','>','500000000')
+            ->where(function($query)
+            {
+                $query->where('refTypeID','10')
+                      ->orWhereBetween('refTypeID',array(63,84));
+            })
+            ->get() as $wallet_journal){
+
+                foreach ($wallet_journal as $wallet_event) {
+                    $hash = md5("$character_id$wallet_event->refID");
+                    $alert_id = 7;
+                    $item_id = "$wallet_event->refID";
+                    $details = "$wallet_event->refID";
+                    BaseSecurity::WriteEvent($hash,$character_id,$alert_id,$item_id,$details);
+                    return $hash;
+                }
+            }
+        }
+        return;
+    }
 }

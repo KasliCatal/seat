@@ -65,7 +65,15 @@
                   <td>{{ $event['alertName'] }}</td>
                   @if($event['alertName'] == 'Mail')
                     <td>
-                      <a href="{{ action('MailController@getRead', array('messageID' => $event['itemID'])) }}">Flagged: {{ $event['details'] }} </a>
+                      <a href="{{ action('MailController@getRead', array('messageID' => $event['itemID'])) }}" class="btn btn-default btn-sm pull-right">
+                        <i class="fa fa-envelope"></i> Flagged: {{ $event['details'] }}
+                      </a>
+                    </td>
+                  @elseif($event['alertName'] == 'Wallet Journal > 500m')
+                    <td>
+                      <a href="{{ action('CharacterController@getFullWalletJournal', array('characterID' => $event['characterID'])) }}" class="btn btn-default btn-sm pull-right">
+                        <i class="fa fa-money"></i> View Full Journal
+                      </a>
                     </td>
                   @else
                     <td><span rel="id-to-name">{{ $event['itemID'] }}</span></td>
