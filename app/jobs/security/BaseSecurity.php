@@ -58,7 +58,7 @@ class BaseSecurity {
 
     public static function characterPeopleGroup($characterID)
     {
-        $character_people_group = DB::table('seat_people_main')
+        $character_people_group = \DB::table('seat_people_main')
                 ->join('seat_people','seat_people_main.personID','=','seat_people.personID')
                 ->join('account_apikeyinfo_characters','account_apikeyinfo_characters.keyID','=','seat_people.keyID')
                 ->where('account_apikeyinfo_characters.characterID',$characterID)
