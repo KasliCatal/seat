@@ -4,7 +4,9 @@
       <div class="nav-tabs-custom">
         <ul class="nav nav-tabs">
             <li class="active"><a href="#res_characters" data-toggle="tab">Characters ({{ count($characters) }})</a></li>
-            <li><a href="#res_character_assets" data-toggle="tab">Character Assets ({{ count($character_assets) }})</a></li>
+            @if(\Auth::hasAccess('W-DIR'))
+              <li><a href="#res_character_assets" data-toggle="tab">Character Assets ({{ count($character_assets) }})</a></li>
+            @endif
             <li><a href="#res_character_contacts" data-toggle="tab">Character Contacts ({{ count($character_contactlist) }})</a></li>
             <li><a href="#res_character_mail" data-toggle="tab">Character Mail ({{ count($character_mail) }})</a></li>
             <li><a href="#res_character_standings" data-toggle="tab">Character Standings ({{ count($character_standings) }})</a></li>
