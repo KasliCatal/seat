@@ -1093,6 +1093,7 @@ class CharacterController extends BaseController
 
         $employment_history = DB::table('eve_characterinfo_employmenthistory')
             ->where('characterID', $characterID)
+            ->orderBy('startDate','desc')
             ->get();
 
         // Finally, give all this to the view to handle
