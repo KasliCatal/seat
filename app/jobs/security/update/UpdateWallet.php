@@ -48,7 +48,7 @@ class UpdateWallet extends BaseSecurity {
             })
             ->get() as $wallet_journal){
 
-                if ( BaseSecurity::characterPeopleGroup($wallet_journal->ownerName1) <> BaseSecurity::characterPeopleGroup($wallet_journal->ownerName2)) {
+                if ( BaseSecurity::characterPeopleGroup($wallet_journal->ownerID1) <> BaseSecurity::characterPeopleGroup($wallet_journal->ownerID2)) {
                     $hash = md5("$character_id$wallet_journal->refID");
                     $alert_id = 7;
                     $item_id = "$wallet_journal->refID";
