@@ -41,6 +41,8 @@ class UpdateWallet extends BaseSecurity {
 
             // loop through the wallet journal for the char looking for flagable issues
             foreach (\EveCharacterWalletJournal::where('characterID',$character_id)->where('amount','>','500000000')
+            ->where('ownerName1','<>','Secure Commerce Commission')
+            ->where('ownerName2','<>','Secure Commerce Commission')
             ->where(function($query)
             {
                 $query->where('refTypeID','10')
