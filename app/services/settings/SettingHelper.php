@@ -54,6 +54,7 @@ class SettingHelper
         'registration_enabled' => 'true',
         'main_character_id' => 1,
         'main_character_name' => null,
+        'email_notifications' => false,
 
         // SeAT Backend
         'seatscheduled_character' => true,
@@ -83,7 +84,8 @@ class SettingHelper
         'thousand_seperator',
         'decimal_seperator',
         'main_character_id',
-        'main_character_name'
+        'main_character_name',
+        'email_notifications'
     );
 
     /*
@@ -101,7 +103,7 @@ class SettingHelper
     |
     */
 
-    public static function getSetting($setting_name, $system_setting = false) {
+    public static function getSetting($setting_name, $system_setting = false, $user_id = null) {
 
         // In some cases, we may want to retrieve the system
         // configured/default setting regardless of the
@@ -115,7 +117,14 @@ class SettingHelper
             // that is in $user_settings we will
             // lookup the setting for the user
             // first
-            if(\Auth::check()) {
+            if(\Auth::check() || !is_null($user_id)) {
+
+                // When specifying a $user_id, we typically want to
+                // get a specific user's settings. Eg: This is the
+                // case when notications wants to check if the
+                // user is configured to retreive email
+                // alerts.
+                $effective_user_id = \Auth::check() ? \Auth::User()->id : $user_id;
 
                 // Check that the setting is one that is OK
                 // for user to have set.
@@ -134,7 +143,7 @@ class SettingHelper
 
                         // Looks like we have a user setting, lets do a
                         // db lookup for it.
-                        $setting_value = \SeatUserSetting::where('user_id', \Auth::User()->id)
+                        $setting_value = \SeatUserSetting::where('user_id', $effective_user_id)
                                 ->where('setting', $setting_name)
                                 ->pluck('value');
 

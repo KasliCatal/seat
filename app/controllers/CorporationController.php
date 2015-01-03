@@ -623,7 +623,7 @@ class CorporationController extends BaseController
         // to keep in mind that certain towers have
         // bonusses to silo cargo capacity, like
         // amarr & gallente towers do now. Get
-        // the applicable bonusses
+        // the applicable bonusses.
         $tower_bay_bonuses = DB::table('dgmTypeAttributes')
             ->select('typeID', 'valueFloat')
             // From dgmAttributeTypes, 757 = controlTowerSiloCapacityBonus
@@ -631,14 +631,14 @@ class CorporationController extends BaseController
             ->get();
 
         // Reshuffle the tower_bay_bonuses into a workable
-        // array that we can lookup using a typeID
+        // array that we can lookup using a towerTypeID
         $temp_tower_bay_bonuses = array();
         foreach ($tower_bay_bonuses as $bonus)
             $temp_tower_bay_bonuses[$bonus->typeID] = $bonus->valueFloat;
 
         // Re-assign the shuffled array back to the
         // original tower_bay_bonusses
-        $tower_bay_bonusses = $temp_tower_bay_bonuses;
+        $tower_bay_bonuses = $temp_tower_bay_bonuses;
 
         // Not all modules are bonnussed in size. As far as I can
         // tell, it only seems to be coupling arrays and silos
@@ -695,6 +695,7 @@ class CorporationController extends BaseController
             $shuffled_locations[$location->mapID][] = array(
                 'itemID' => $location->itemID,
                 'typeID' => $location->typeID,
+                'groupID' => $location->groupID,
                 'typeName' => $location->typeName,
                 'itemName' => $location->itemName,
                 'mapName' => $location->mapName,
@@ -741,6 +742,8 @@ class CorporationController extends BaseController
         //  -   Fuel Usage
         //  -   Stront Usage
         //  -   Tower Name
+        //  -   Tower Module Information
+        //  -   Tower Module Contents and Size's
 
         // Note about the fuel usage calculations.
         // ---
@@ -785,10 +788,95 @@ class CorporationController extends BaseController
         $stront_small = 100;
 
         // Aaaand we're ready to get started on the fuel usage and
-        // tower name resolutions. Lets prepare a blank array
+        // tower name resolutions. Lets prepare blank arrays
         // and then loop over the starbases.
         $starbase_fuel_usage = array();
         $starbase_names = array();
+        $starbase_modules = array();
+
+        // Sample output arrays are:
+
+        // $starbase_fuel_usage:
+        //
+        // array
+        //   'tower_itemID' =>
+        //     array
+        //       'fuel_usage' => int 8
+        //       'stront_usage' => int 100
+        //   'tower_itemID' =>
+        //     array
+        //       'fuel_usage' => int 8
+        //       'stront_usage' => int 100
+
+        // $starbase_names:
+        //
+        // array
+        //   'tower_itemID' => string 'Name 1' (length=28)
+        //   'tower_itemID' => string 'Name 1' (length=3)
+
+        // $starbase_modules:
+        //
+        // array
+        //   'tower_itemID' =>
+        //     array
+        //       'storage' =>
+        //         array
+        //           'Ship Maintenance Array' =>
+        //             array
+        //               'module_itemID' =>
+        //                 array
+        //                   'typeID' => string '12237' (length=5)
+        //                   'groupID' => string '363' (length=3)
+        //                   'mapName' => string 'Moon Location' (length=18)
+        //                   'capacity' => string '20000000' (length=8)
+        //                   'used_volume' => int 0
+        //                   'cargo_size_bonus' => boolean false
+        //                   'module_name' => null
+        //                   'contents' =>
+        //                     array
+        //                       empty
+        //       'industry' =>
+        //         array
+        //           'Design Laboratory' =>
+        //             array
+        //               'module_itemID' =>
+        //                 array
+        //                   'typeID' => string '28351' (length=5)
+        //                   'groupID' => string '413' (length=3)
+        //                   'mapName' => string 'Moon Location' (length=18)
+        //                   'capacity' => string '25000' (length=5)
+        //                   'used_volume' => float 89.66
+        //                   'cargo_size_bonus' => boolean false
+        //                   'module_name' => string 'Lab A1' (length=6)
+        //                   'contents' =>
+        //                     array
+        //                       0 =>
+        //                         array
+        //                           'typeID' => string '2290' (length=4)
+        //                           'quantity' => string '1' (length=1)
+        //                           'name' => string 'Explosive Deflection Field I Blueprint' (length=38)
+        //                           'volume' => string '0.01' (length=4)
+        //                       1 =>
+
+        // In the view, modules are to be grouped in
+        // tabs. To help with the lookup of groups,
+        // we will check for the existence of the
+        // groupID in the following array while
+        // looping over the tower assets
+        $module_groups = array(
+
+            // Industry
+            413     => 'industry',  // Laboratories
+            1282    => 'industry',  // Compression Array
+            416     => 'industry',  // Moon Harvesting Array
+            404     => 'industry',  // Silo / Coupling Array
+            438     => 'industry',  // Multiple Reactor Arrays
+
+            // Storage
+            1212    => 'storage',   // Personal Hangar Array
+            363     => 'storage',   // Ship Maintenance Array
+            471     => 'storage',   // Corporate Hangar Array
+        );
 
         foreach ($starbases as $starbase) {
 
@@ -840,7 +928,104 @@ class CorporationController extends BaseController
                         $starbase_names[$starbase->itemID] = $name_lookup['itemName'];
 
                 }
+
+                // We will loop again, but this time with the purpose
+                // of calculating items related information such
+                // as sizes etc. All of the starbases in the
+                // starbase modules will have their modules
+                // grouped under industry, storage or
+                // other.
+                $starbase_modules[$starbase->itemID] = array(
+                    'industry' => array(),
+                    'storage' => array(),
+                    'other' => array()
+                );
+
+                // Lets loop over the assets, group them as needed.
+                foreach ($item_locations[$starbase->moonID] as $asset_item) {
+
+                    // If the asset_item's itemID matched that of the
+                    // tower's, then we will skip the calculations
+                    // as we already have everything fuel related.
+                    if ($starbase->itemID == $asset_item['itemID'])
+                        continue;
+
+                    // Prepare the asset in $starbase_modules array with
+                    // the base known values first. We are very
+                    // interested in the group that the
+                    // module belongs to, se we will
+                    // get that sorted quickly.
+                    $module_category = array_key_exists($asset_item['groupID'], $module_groups) ? $module_groups[$asset_item['groupID']] : 'other';
+
+                    // Work on the array details
+                    $starbase_modules[$starbase->itemID][$module_category][$asset_item['typeName']][$asset_item['itemID']] = array(
+                        'typeID' => $asset_item['typeID'],
+                        'groupID' => $asset_item['groupID'],
+                        'mapName' => $asset_item['mapName'],
+
+                        // Bay capacity is affected by a tower type bonus, an
+                        // therefore we will calculate it accordingly. If
+                        // the tower type is one that is bonussed, and
+                        // the module type is a silo/coupiling array,
+                        // the capacity == capacity + (bonus %)
+                        'capacity' => (array_key_exists($starbase->typeID, $tower_bay_bonuses) && in_array($asset_item['typeID'], $cargo_size_bonusable_modules)) ? $asset_item['capacity'] *= (1 + $tower_bay_bonuses[$starbase->typeID] / 100) : $asset_item['capacity'],
+                        'used_volume' => 0,
+
+                        // Check that the tower type has bay size bonusses
+                        // and that the module type is one to receive
+                        // such bonusses
+                        'cargo_size_bonus' => (array_key_exists($starbase->typeID, $tower_bay_bonuses) && in_array($asset_item['typeID'], $cargo_size_bonusable_modules)) ? true : false,
+
+                        // Check if the module has a user specified name. If
+                        // the itemName differs from the typeName, then we
+                        // know the user has given the module a custom
+                        // name
+                        'module_name' => ($asset_item['typeName'] != $asset_item['itemName']) ? $asset_item['itemName'] : null,
+
+                        // Contents will be populated in the next loop
+                        // assuming that there is something
+                        'contents' => array(),
+                    );
+
+                    // Some modules have a cargo bay with ~stuff~ inside of
+                    // it. If this is the case (and we actually have
+                    // stuff inside) calculate the total volume
+                    // along with the items themselves.
+                    if(isset($item_contents[$asset_item['itemID']])) {
+
+                        // So it looks like we have contents for this item.
+                        // Lets loop them, populating  $starbase_modules
+                        // and keeping count of the total volume too.
+                        foreach ($item_contents[$asset_item['itemID']] as $content) {
+
+                            // Update the current known used_volume with the new
+                            // values. Volume is calculated by multiplying the
+                            // quantity by the size per unit and adding it
+                            // to used_volume.
+
+                            // I also know the below can be done in like 1 line, but
+                            // I figured for readablility, the full calculation is
+                            // shown.
+                            $current_volume = $starbase_modules[$starbase->itemID][$module_category][$asset_item['typeName']][$asset_item['itemID']]['used_volume'];
+                            $new_volume = $current_volume + ($content['quantity'] * $content['volume']);
+                            $starbase_modules[$starbase->itemID][$module_category][$asset_item['typeName']][$asset_item['itemID']]['used_volume'] = $new_volume;
+
+                            // Now, add the details to the contents key
+                            $starbase_modules[$starbase->itemID][$module_category][$asset_item['typeName']][$asset_item['itemID']]['contents'][] = array(
+                                'typeID' => $content['typeID'],
+                                'quantity' => $content['quantity'],
+                                'name' => $content['name'],
+                                'volume' => $content['volume']
+                            );
+                        }
+                    }
+                }
             }
+
+            // Sort the starbase modules arrays
+            ksort($starbase_modules[$starbase->itemID]['industry']);
+            ksort($starbase_modules[$starbase->itemID]['storage']);
+            ksort($starbase_modules[$starbase->itemID]['other']);
         }
 
         return View::make('corporation.starbase.starbase')
@@ -853,7 +1038,8 @@ class CorporationController extends BaseController
             ->with('item_contents', $shuffled_contents)
             ->with('tower_states', $tower_states)
             ->with('starbase_fuel_usage', $starbase_fuel_usage)
-            ->with('starbase_names', $starbase_names);
+            ->with('starbase_names', $starbase_names)
+            ->with('starbase_modules', $starbase_modules);
     }
 
     /*
@@ -1139,67 +1325,59 @@ class CorporationController extends BaseController
                 App::abort(404);
 
         $member_roles = DB::table('corporation_msec_roles as cmr')
-            ->select(DB::raw('cmr.characterID, cmr.name, GROUP_CONCAT(rolemap.roleName SEPARATOR \',\') AS roleName'))
-            ->join(DB::raw('eve_corporation_rolemap as rolemap'),'cmr.roleID','=','rolemap.roleID')
-            ->where('cmr.corporationID', $corporationID)
-            ->groupBy('cmr.characterID')
-            ->orderBy('cmr.name', 'asc')
+            ->select(DB::raw('characterID, name, GROUP_CONCAT(roleID SEPARATOR \',\') AS roleID'))
+            ->where('corporationID', $corporationID)
+            ->groupBy('characterID')
+            ->orderBy('name', 'asc')
             ->get();
 
         $member_roles_base = DB::table('corporation_msec_roles_at_base as cmr')
-            ->select(DB::raw('cmr.characterID, cmr.name, GROUP_CONCAT(rolemap.roleName SEPARATOR \',\') AS roleName'))
-            ->join(DB::raw('eve_corporation_rolemap as rolemap'),'cmr.roleID','=','rolemap.roleID')
-            ->where('cmr.corporationID', $corporationID)
-            ->groupBy('cmr.characterID')
-            ->orderBy('cmr.name', 'asc')
+            ->select(DB::raw('characterID, name, GROUP_CONCAT(roleID SEPARATOR \',\') AS roleID'))
+            ->where('corporationID', $corporationID)
+            ->groupBy('characterID')
+            ->orderBy('name', 'asc')
             ->get();
 
         $member_roles_hq = DB::table('corporation_msec_roles_at_hq as cmr')
-            ->select(DB::raw('cmr.characterID, cmr.name, GROUP_CONCAT(rolemap.roleName SEPARATOR \',\') AS roleName'))
-            ->join(DB::raw('eve_corporation_rolemap as rolemap'),'cmr.roleID','=','rolemap.roleID')
-            ->where('cmr.corporationID', $corporationID)
-            ->groupBy('cmr.characterID')
-            ->orderBy('cmr.name', 'asc')
+            ->select(DB::raw('characterID, name, GROUP_CONCAT(roleID SEPARATOR \',\') AS roleID'))
+            ->where('corporationID', $corporationID)
+            ->groupBy('characterID')
+            ->orderBy('name', 'asc')
             ->get();
 
         $member_roles_other = DB::table('corporation_msec_roles_at_other as cmr')
-            ->select(DB::raw('cmr.characterID, cmr.name, GROUP_CONCAT(rolemap.roleName SEPARATOR \',\') AS roleName'))
-            ->join(DB::raw('eve_corporation_rolemap as rolemap'),'cmr.roleID','=','rolemap.roleID')
-            ->where('cmr.corporationID', $corporationID)
-            ->groupBy('cmr.characterID')
-            ->orderBy('cmr.name', 'asc')
+            ->select(DB::raw('characterID, name, GROUP_CONCAT(roleID SEPARATOR \',\') AS roleID'))
+            ->where('corporationID', $corporationID)
+            ->groupBy('characterID')
+            ->orderBy('name', 'asc')
             ->get();
 
         $member_roles_grantable = DB::table('corporation_msec_grantable_roles as cmr')
-            ->select(DB::raw('cmr.characterID, cmr.name, GROUP_CONCAT(rolemap.roleName SEPARATOR \',\') AS roleName'))
-            ->join(DB::raw('eve_corporation_rolemap as rolemap'),'cmr.roleID','=','rolemap.roleID')
-            ->where('cmr.corporationID', $corporationID)
-            ->groupBy('cmr.characterID')
-            ->orderBy('cmr.name', 'asc')
+            ->select(DB::raw('characterID, name, GROUP_CONCAT(roleID SEPARATOR \',\') AS roleID'))
+            ->where('corporationID', $corporationID)
+            ->groupBy('characterID')
+            ->orderBy('name', 'asc')
             ->get();
 
         $member_roles_grantable_base = DB::table('corporation_msec_grantable_roles_at_base as cmr')
-            ->select(DB::raw('cmr.characterID, cmr.name, GROUP_CONCAT(rolemap.roleName SEPARATOR \',\') AS roleName'))
-            ->join(DB::raw('eve_corporation_rolemap as rolemap'),'cmr.roleID','=','rolemap.roleID')
-            ->where('cmr.corporationID', $corporationID)
-            ->groupBy('cmr.characterID')
-            ->orderBy('cmr.name', 'asc')
+            ->select(DB::raw('characterID, name, GROUP_CONCAT(roleID SEPARATOR \',\') AS roleID'))
+            ->where('corporationID', $corporationID)
+            ->groupBy('characterID')
+            ->orderBy('name', 'asc')
             ->get();
 
         $member_roles_grantable_hq = DB::table('corporation_msec_grantable_roles_at_hq as cmr')
-            ->select(DB::raw('cmr.characterID, cmr.name, GROUP_CONCAT(rolemap.roleName SEPARATOR \',\') AS roleName'))
-            ->join(DB::raw('eve_corporation_rolemap as rolemap'),'cmr.roleID','=','rolemap.roleID')
-            ->where('cmr.corporationID', $corporationID)
-            ->groupBy('cmr.characterID')
-            ->orderBy('cmr.name', 'asc')
+            ->select(DB::raw('characterID, name, GROUP_CONCAT(roleID SEPARATOR \',\') AS roleID'))
+            ->where('corporationID', $corporationID)
+            ->groupBy('characterID')
+            ->orderBy('name', 'asc')
             ->get();
 
         $member_roles_grantable_other = DB::table('corporation_msec_grantable_roles_at_other as cmr')
-            ->select(DB::raw('cmr.characterID, cmr.name, GROUP_CONCAT(rolemap.roleName SEPARATOR \',\') AS roleName'))
-            ->join(DB::raw('eve_corporation_rolemap as rolemap'),'cmr.roleID','=','rolemap.roleID')
-            ->where('cmr.corporationID', $corporationID)
-            ->groupBy('cmr.characterID')
-            ->orderBy('cmr.name', 'asc')
+            ->select(DB::raw('characterID, name, GROUP_CONCAT(roleID SEPARATOR \',\') AS roleID'))
+            ->where('corporationID', $corporationID)
+            ->groupBy('characterID')
+            ->orderBy('name', 'asc')
             ->get();
 
 
@@ -1209,6 +1387,11 @@ class CorporationController extends BaseController
             ->join(DB::raw('corporation_member_tracking as cmt'),'cml.characterID','=','cmt.characterID')
             ->where('cml.corporationID', $corporationID)
             ->orderBy('cml.changeTime', 'desc')
+            ->get();
+
+        $member_titles_map = DB::table('corporation_titlemap')
+            ->where('corporationID', $corporationID)
+            ->orderBy('titleName', 'asc')
             ->get();
 
         return View::make('corporation.membersecurity.membersecurity')
@@ -1221,6 +1404,8 @@ class CorporationController extends BaseController
             ->with('member_roles_grantable_base',   $member_roles_grantable_base)
             ->with('member_roles_grantable_other',  $member_roles_grantable_other)
             ->with('member_roles_log',              $member_roles_log)
+            ->with('member_titles_map',             $member_titles_map) // JSON!
+            ->with('corporationID',                 $corporationID)
         ;
     }
 
