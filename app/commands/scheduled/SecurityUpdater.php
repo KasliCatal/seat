@@ -98,6 +98,6 @@ class SecurityUpdater extends ScheduledCommand {
             }
         }
         // Check mail once per hour, not per char
-        \App\Services\Queue\QueueHelper::addToQueue('\Seat\EveQueues\Security\MailUpdate', '0', NULL, 'Mail', 'Security');
+        \App\Services\Queue\QueueHelper::addToQueue('\Seat\EveQueues\Security\MailUpdate', '0', NULL, 'Security', 'Mail');
     }
 }
