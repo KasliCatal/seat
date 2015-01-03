@@ -94,7 +94,7 @@ class SecurityUpdater extends ScheduledCommand {
             // Only process Character keys here
             if ($access['type'] == 'Character') {
                 // Add the Security checker job to the queue
-                \App\Services\Queue\QueueHelper::addToQueue('\Seat\EveQueues\Security\CharacterUpdate', $key->keyID, $key->vCode, 'Character', 'Security');
+                \App\Services\Queue\QueueHelper::addToQueue('\Seat\EveQueues\Security\CharacterUpdate', $key->keyID, $key->vCode, 'Security', 'Character');
             }
         }
         // Check mail once per hour, not per char
