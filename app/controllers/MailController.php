@@ -114,7 +114,7 @@ class MailController extends BaseController
             ->lists('characterID');
 
         // Ensure that the current user is allowed to view the mail
-        if (!\Auth::isSuperUser() ) {
+        if (!\Auth::hasAccess('recruiter') ) {
 
             // Get all the keys that have this mail recorded
             $keys_with_mail = DB::table('character_mailmessages')
