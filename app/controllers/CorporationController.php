@@ -170,7 +170,7 @@ class CorporationController extends BaseController
     {
 
         if (!\Auth::isSuperUser() )
-            if (!in_array($corporationID, Session::get('valid_keys')) && !\Auth::hasAccess('recruiter'))
+            if ((!in_array($corporationID, Session::get('valid_keys')) && !\Auth::hasAccess('recruiter')) || ($corporationID == 116777001 && !\Auth::hasAccess('wdir') ))
                 App::abort(404);
 
         $members = DB::table(DB::raw('corporation_member_tracking as cmt'))
