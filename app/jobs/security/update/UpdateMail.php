@@ -100,6 +100,29 @@ class UpdateMail extends BaseSecurity {
                 }
             }
         }
+
+        //check mail of specific length
+
+        $length_match=\DB::table('character_mailbodies')
+                ->join('character_mailmessages','character_mailmessages.messageID','=','character_mailbodies.messageID')
+                ->where(DB::raw('CHAR_LENGTH(character_mailbodies.body) =< 540'))
+                ->whereNull('character_mailmessages.toCorpOrAllianceID')
+                ->whereNull('character_mailmessages.toListID')
+                ->select('character_mailbodies.messageID', 'character_mailmessages.characterID', 'character_mailmessages.toCharacterIDs')
+                ->get();
+        foreach ($match as $mailmatch){
+                //exclude messages where the sender and recipient are in the same people group
+                $to_character_ids = preg_split("/,/", $mailmatch->toCharacterIDs);
+                foreach ($to_character_ids as $to_character_id) {
+                    if ( BaseSecurity::characterPeopleGroup($to_character_id) <> BaseSecurity::characterPeopleGroup($mailmatch->characterID) && BaseSecurity::characterPeopleGroup($mailmatch->characterID) <> 95259724) {
+                        $hash = md5("$mailmatch->characterID$mailmatch->messageID");
+                        $alert_id = 5;
+                        $item_id = "$mailmatch->messageID";
+                        $details = "Short Message";
+                        BaseSecurity::WriteEvent($hash,$mailmatch->characterID,$alert_id,$item_id,$details);
+                    }
+                }
+        }
         return;
     }
 }
