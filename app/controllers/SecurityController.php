@@ -20,10 +20,23 @@ class SecurityController extends BaseController {
 
     public function getShortStatus()
     {
+        // Query the database for all the characters and some related
+        // information
+        $db_queue_count = DB::table('security_events')
+            ->leftJoin('seat_keys', 'account_apikeyinfo_characters.keyID', '=', 'seat_keys.keyID')
+            ->join('character_charactersheet', 'account_apikeyinfo_characters.characterID', '=', 'security_events.characterID')
+            ->groupBy('account_apikeyinfo_characters.characterID');
 
-        // Get the Queue information from the database
-        $db_queue_count = \SecurityEvents::where('result','0')
-            ->count();
+        if (\Auth::hasAccess('wdir')) {
+            // Get the Queue information from the database
+            $db_queue_count = \SecurityEvents::where('result','0')
+                ->count();
+        }elseif (\Auth::hasAccess('recruiter')) {
+            $db_queue_count = $db_queue_count->whereIn('seat_keys.keyID', Session::get('valid_keys'))
+                ->where('security_events.result','0')
+                ->get();
+
+        }
 
         $response = array(
             'security_count' => $db_queue_count
@@ -73,7 +86,7 @@ class SecurityController extends BaseController {
 
     public function postFindEvents()
     {
-        // Query the databse for all the characters and some related
+        // Query the database for all the characters and some related
         // information
         $characters = DB::table('account_apikeyinfo_characters')
             ->leftJoin('seat_keys', 'account_apikeyinfo_characters.keyID', '=', 'seat_keys.keyID')

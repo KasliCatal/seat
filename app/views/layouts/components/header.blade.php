@@ -42,7 +42,7 @@
             <span class="label label-info" id="notification_count">0</span>
           </a>
         </li>
-        @if(\Auth::hasAccess('recruiter'))
+        @if(\Auth::hasAccess('recruiter') || \Auth::hasAccess('wdir'))
           <li class="dropdown tasks-menu">
             <a href="{{ action('SecurityController@getView') }}" data-toggle="tooltip" title="" data-placement="bottom" data-original-title="Security Events">
               <i class="fa fa-lock"></i>
