@@ -202,7 +202,7 @@ class SecurityController extends BaseController {
             'notes'           => $event_details->notes,
         );
 
-        if(\Auth::hasAccess('wdir') || ) {
+        if(\Auth::hasAccess('wdir')) {
             return View::make('security.details')
                 ->with('event',$event);
         }elseif (\Auth::hasAccess('recruiter')){
