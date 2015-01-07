@@ -24,8 +24,7 @@ class SecurityController extends BaseController {
         // information
         $db_queue_count = DB::table('account_apikeyinfo_characters')
             ->leftJoin('seat_keys', 'account_apikeyinfo_characters.keyID', '=', 'seat_keys.keyID')
-            ->join('security_events','security_events.characterID','=','account_apikeyinfo_characters.characterID')
-            ->groupBy('account_apikeyinfo_characters.characterID');
+            ->join('security_events','security_events.characterID','=','account_apikeyinfo_characters.characterID');
 
         if (\Auth::hasAccess('wdir')) {
             // Get the Queue information from the database
@@ -34,7 +33,7 @@ class SecurityController extends BaseController {
         }elseif (\Auth::hasAccess('recruiter')) {
             $db_queue_count = $db_queue_count->whereIn('seat_keys.keyID', Session::get('valid_keys'))
                 ->where('security_events.result','0')
-                ->get();
+                ->count();
 
         }
 
