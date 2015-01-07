@@ -51,7 +51,7 @@ class CharacterController extends BaseController
         // Check that we only return characters that the current
         // user has access to. SuperUser() automatically
         // inherits all permissions
-        if (!\Auth::hasAccess('recruiter'))
+        if (!\Auth::hasAccess('wdir'))
             $characters = $characters->whereIn('seat_keys.keyID', Session::get('valid_keys'))
                 ->get();
         else
