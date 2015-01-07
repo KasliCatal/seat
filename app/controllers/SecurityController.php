@@ -34,6 +34,8 @@ class SecurityController extends BaseController {
             $db_queue_count = $db_queue_count->whereIn('seat_keys.keyID', Session::get('valid_keys'))
                 ->where('security_events.result','0')
                 ->count();
+        }else{
+            $db_queue_count = 0;
         }
 
         $response = array(
