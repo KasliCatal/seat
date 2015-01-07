@@ -185,12 +185,31 @@ class SecurityController extends BaseController {
 
     public function getView()
     {
-        if(\Auth::hasAccess('recruiter')) {
+        // Query the databse for all the characters and some related
+        // information
+        $characters = DB::table('account_apikeyinfo_characters')
+            ->leftJoin('seat_keys', 'account_apikeyinfo_characters.keyID', '=', 'seat_keys.keyID')
+            ->join('character_charactersheet', 'account_apikeyinfo_characters.characterID', '=', 'character_charactersheet.characterID')
+            ->join('character_skillintraining', 'account_apikeyinfo_characters.characterID', '=', 'character_skillintraining.characterID')
+            ->orderBy('seat_keys.isOk', 'asc')
+            ->orderBy('account_apikeyinfo_characters.characterName', 'asc')
+            ->groupBy('account_apikeyinfo_characters.characterID');
+
+        // Check that we only return characters that the current
+        // user has access to. SuperUser() automatically
+        // inherits all permissions
+        if (!\Auth::hasAccess('recruiter'))
+            $characters = $characters->whereIn('seat_keys.keyID', Session::get('valid_keys'))
+                ->get();
+        else
+            $characters = $characters->get();
+
+        foreach( $characters as $character) {
             $open_events = \DB::table('security_events')
                 ->join('security_alerts','security_alerts.alertID','=','security_events.alertID')
                 ->where('result',0)
+                ->where('CharacterID',$character->CharacterID)
                 ->get();
-
             foreach ($open_events as $row) {
 
                 $events[$row->id] = array (
@@ -202,11 +221,9 @@ class SecurityController extends BaseController {
                     'alertName'       => $row->alertName
                 );
             }
-            return View::make('security.view')
-                ->with('events',$events);
-        }else{
-            App::abort(404);
         }
+        return View::make('security.view')
+            ->with('events',$events);
     }
 
     /*
