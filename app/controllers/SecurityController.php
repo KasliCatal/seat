@@ -130,7 +130,7 @@ class SecurityController extends BaseController {
             }
         }
 
-        if ($events)
+        if (isset($events))
             return View::make('security.view')
                 ->with('events',$events);
         else
