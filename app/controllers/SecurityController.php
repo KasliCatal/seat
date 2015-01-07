@@ -73,26 +73,49 @@ class SecurityController extends BaseController {
 
     public function postFindEvents()
     {
-        if(\Auth::hasAccess('recruiter')) {
-            $search_criteria = Input::get('search_criteria');
-            if ($search_criteria == '')
-                return Redirect::action('SecurityController@getView');
+        // Query the databse for all the characters and some related
+        // information
+        $characters = DB::table('account_apikeyinfo_characters')
+            ->leftJoin('seat_keys', 'account_apikeyinfo_characters.keyID', '=', 'seat_keys.keyID')
+            ->join('character_charactersheet', 'account_apikeyinfo_characters.characterID', '=', 'character_charactersheet.characterID')
+            ->join('character_skillintraining', 'account_apikeyinfo_characters.characterID', '=', 'character_skillintraining.characterID')
+            ->orderBy('seat_keys.isOk', 'asc')
+            ->orderBy('account_apikeyinfo_characters.characterName', 'asc')
+            ->groupBy('account_apikeyinfo_characters.characterID');
 
-            $search_criteria = htmlspecialchars($search_criteria);
+        // Check that we only return characters that the current
+        // user has access to. SuperUser() automatically
+        // inherits all permissions
+        if (\Auth::hasAccess('wdir'))
+            $characters = $characters->get();
+        elseif (\Auth::hasAccess('recruiter')) 
+            $characters = $characters->whereIn('seat_keys.keyID', Session::get('valid_keys'))
+                ->get();
+        else
+            App::abort(404);
 
+
+        $search_criteria = Input::get('search_criteria');
+        if ($search_criteria == '')
+            return Redirect::action('SecurityController@getView');
+
+        $search_criteria = htmlspecialchars($search_criteria);
+
+        foreach( $characters as $character) {
             $search_characters = DB::table('security_events')
                 ->join('eve_characterinfo','eve_characterinfo.characterID','=','security_events.characterID')
                 ->join('security_alerts','security_alerts.alertID','=','security_events.alertID')
                 ->where('eve_characterinfo.characterName','like',"%$search_criteria%")
+                ->where('characterID',$character->characterID)
                 ->select('security_events.*', 'security_alerts.alertName');
             $search_events = DB::table('security_events')
                 ->join('security_alerts','security_alerts.alertID','=','security_events.alertID')
                 ->where('id',$search_criteria)
+                ->where('characterID',$character->characterID)
                 ->select('security_events.*', 'security_alerts.alertName')
                 ->union($search_characters)
                 ->get();
             if ($search_events){
-
                 foreach ($search_events as $row) {
 
                     $events[$row->id] = array (
@@ -104,11 +127,15 @@ class SecurityController extends BaseController {
                         'alertName'       => $row->alertName
                     );
                 }
-                return View::make('security.view')
-                    ->with('events',$events);
             }
+        }
 
-            return Redirect::action('SecurityController@getView');
+        if ($events)
+            return View::make('security.view')
+                ->with('events',$events);
+        else
+            return Redirect::action('SecurityController@getView')
+                ->withError($search_criteria . ' Not Found');
         }else{
             App::abort(404);
         }
@@ -198,11 +225,13 @@ class SecurityController extends BaseController {
         // Check that we only return characters that the current
         // user has access to. SuperUser() automatically
         // inherits all permissions
-        if (!\Auth::hasAccess('recruiter'))
+        if (\Auth::hasAccess('wdir'))
+            $characters = $characters->get();
+        elseif (\Auth::hasAccess('recruiter')) 
             $characters = $characters->whereIn('seat_keys.keyID', Session::get('valid_keys'))
                 ->get();
         else
-            $characters = $characters->get();
+            App::abort(404);
 
         foreach( $characters as $character) {
             $open_events = \DB::table('security_events')
