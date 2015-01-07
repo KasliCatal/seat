@@ -162,7 +162,7 @@ class DashboardController extends BaseController
                     $query->where('character_mailmessages.senderName', 'like', '%' . Input::get('q') . '%')
                     ->orWhere('character_mailmessages.title', 'like', '%' . Input::get('q') . '%')
                     ->orWhere('character_mailbodies.body', 'like', '%' . Input::get('q') . '%');
-                })
+                });
 
             // Ensure we only get result for characters we have access to
             if (!\Auth::hasAccess('wdir'))
