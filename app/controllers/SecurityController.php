@@ -22,9 +22,9 @@ class SecurityController extends BaseController {
     {
         // Query the database for all the characters and some related
         // information
-        $db_queue_count = DB::table('security_events')
+        $db_queue_count = DB::table('account_apikeyinfo_characters')
             ->leftJoin('seat_keys', 'account_apikeyinfo_characters.keyID', '=', 'seat_keys.keyID')
-            ->join('character_charactersheet', 'account_apikeyinfo_characters.characterID', '=', 'security_events.characterID')
+            ->join('security_events','security_events.characterID','=','account_apikeyinfo_characters.characterID')
             ->groupBy('account_apikeyinfo_characters.characterID');
 
         if (\Auth::hasAccess('wdir')) {
