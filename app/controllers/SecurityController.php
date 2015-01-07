@@ -34,7 +34,6 @@ class SecurityController extends BaseController {
             $db_queue_count = $db_queue_count->whereIn('seat_keys.keyID', Session::get('valid_keys'))
                 ->where('security_events.result','0')
                 ->count();
-
         }
 
         $response = array(
@@ -89,10 +88,6 @@ class SecurityController extends BaseController {
         // information
         $characters = DB::table('account_apikeyinfo_characters')
             ->leftJoin('seat_keys', 'account_apikeyinfo_characters.keyID', '=', 'seat_keys.keyID')
-            ->join('character_charactersheet', 'account_apikeyinfo_characters.characterID', '=', 'character_charactersheet.characterID')
-            ->join('character_skillintraining', 'account_apikeyinfo_characters.characterID', '=', 'character_skillintraining.characterID')
-            ->orderBy('seat_keys.isOk', 'asc')
-            ->orderBy('account_apikeyinfo_characters.characterName', 'asc')
             ->groupBy('account_apikeyinfo_characters.characterID');
 
         // Check that we only return characters that the current
@@ -192,10 +187,6 @@ class SecurityController extends BaseController {
         // information
         $characters = DB::table('account_apikeyinfo_characters')
             ->leftJoin('seat_keys', 'account_apikeyinfo_characters.keyID', '=', 'seat_keys.keyID')
-            ->join('character_charactersheet', 'account_apikeyinfo_characters.characterID', '=', 'character_charactersheet.characterID')
-            ->join('character_skillintraining', 'account_apikeyinfo_characters.characterID', '=', 'character_skillintraining.characterID')
-            ->orderBy('seat_keys.isOk', 'asc')
-            ->orderBy('account_apikeyinfo_characters.characterName', 'asc')
             ->groupBy('account_apikeyinfo_characters.characterID');
 
         $eventid = htmlspecialchars($eventid);
@@ -247,10 +238,6 @@ class SecurityController extends BaseController {
         // information
         $characters = DB::table('account_apikeyinfo_characters')
             ->leftJoin('seat_keys', 'account_apikeyinfo_characters.keyID', '=', 'seat_keys.keyID')
-            ->join('character_charactersheet', 'account_apikeyinfo_characters.characterID', '=', 'character_charactersheet.characterID')
-            ->join('character_skillintraining', 'account_apikeyinfo_characters.characterID', '=', 'character_skillintraining.characterID')
-            ->orderBy('seat_keys.isOk', 'asc')
-            ->orderBy('account_apikeyinfo_characters.characterName', 'asc')
             ->groupBy('account_apikeyinfo_characters.characterID');
 
         // Check that we only return characters that the current
@@ -297,7 +284,7 @@ class SecurityController extends BaseController {
 
     public function getSettings()
     {
-        if(\Auth::hasAccess('recruiter')) {
+        if(\Auth::hasAccess('wdir')) {
             $keywords = $event_details = \DB::table('security_keywords')->get();
 
             return View::make('security.settings')
@@ -318,7 +305,7 @@ class SecurityController extends BaseController {
 
     public function getDeleteKeyword($keywordID)
     {
-        if(\Auth::hasAccess('recruiter')) {
+        if(\Auth::hasAccess('wdir')) {
             $keyword = \SecurityKeywords::find($keywordID);
 
             $keyword->delete();
@@ -341,7 +328,7 @@ class SecurityController extends BaseController {
 
     public function postAddKeyword()
     {
-        if(\Auth::hasAccess('recruiter')) {
+        if(\Auth::hasAccess('wdir')) {
             $newword = htmlspecialchars(Input::get('newword'));
             $type    = htmlspecialchars(Input::get('type'));
 
