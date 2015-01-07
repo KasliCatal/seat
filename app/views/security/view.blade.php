@@ -69,7 +69,7 @@
                         <i class="fa fa-envelope"></i> Flagged: {{ $event['details'] }}
                       </a>
                     </td>
-                  @elseif($event['alertName'] == 'Wallet Journal > 500m')
+                  @elseif($event['alertName'] == 'Wallet Journal > 500m' || $event['alertName'] == 'Wallet Journal == 5m' )
                     <td>
                       <a href="{{ action('CharacterController@getFullWalletJournal', array('characterID' => $event['characterID'])) }}" class="btn btn-default btn-sm">
                         <i class="fa fa-money"></i> {{ $event['details'] }}

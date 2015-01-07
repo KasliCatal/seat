@@ -58,6 +58,22 @@ class UpdateWallet extends BaseSecurity {
                     BaseSecurity::WriteEvent($hash,$character_id,$alert_id,$item_id,$details);
                 }
             }
+
+            // loop through the wallet journal looking for donations of extactly 5mil (locator service)
+            foreach (\EveCharacterWalletJournal::where('characterID',$character_id)->where('amount','5000000')
+                ->where('ownerName1','<>','Secure Commerce Commission')
+                ->where('ownerName2','<>','Secure Commerce Commission')
+                ->where('refTypeID','10')
+                 ->get() as $wallet_journal){
+
+                if ( BaseSecurity::characterPeopleGroup($wallet_journal->ownerID1) <> BaseSecurity::characterPeopleGroup($wallet_journal->ownerID2)) {
+                    $hash = md5("$character_id$wallet_journal->refID");
+                    $alert_id = 8;
+                    $item_id = "$wallet_journal->refID";
+                    $details = "Exactly 5Mil Between $wallet_journal->ownerName1 and $wallet_journal->ownerName2";
+                    BaseSecurity::WriteEvent($hash,$character_id,$alert_id,$item_id,$details);
+                }
+            }
         }
         return;
     }
