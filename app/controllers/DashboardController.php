@@ -162,7 +162,7 @@ class DashboardController extends BaseController
                 ->orWhere('character_mailbodies.body', 'like', '%' . Input::get('q') . '%');
 
             // Ensure we only get result for characters we have access to
-            if (!\Auth::hasAccess('testsdfsd'))
+            //if (!\Auth::hasAccess('wdir'))
                 $character_mail = $character_mail->whereIn('account_apikeyinfo_characters.keyID', Session::get('valid_keys'));
 
             $character_mail = $character_mail
