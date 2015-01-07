@@ -110,7 +110,7 @@ class UpdateMail extends BaseSecurity {
                 ->whereNull('character_mailmessages.toListID')
                 ->select('character_mailbodies.messageID', 'character_mailmessages.characterID', 'character_mailmessages.toCharacterIDs')
                 ->get();
-        foreach ($match as $mailmatch){
+        foreach ($length_match as $mailmatch){
                 //exclude messages where the sender and recipient are in the same people group
                 $to_character_ids = preg_split("/,/", $mailmatch->toCharacterIDs);
                 foreach ($to_character_ids as $to_character_id) {
