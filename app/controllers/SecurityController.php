@@ -175,27 +175,49 @@ class SecurityController extends BaseController {
 
     public function getDetails($eventid)
     {
-        if(\Auth::hasAccess('recruiter')) {
-            $eventid = htmlspecialchars($eventid);
-            $event_details = \DB::table('security_events')
-                ->join('security_alerts','security_alerts.alertID','=','security_events.alertID')
-                ->where('id',$eventid)
-                ->first();
-            $event[$event_details->id] = array (
-                'eventid'         => $event_details->id,
-                'characterID'     => $event_details->characterID,
-                'peopleGroupID'   => $this->characterPeopleGroup($event_details->characterID),
-                'itemID'          => $event_details->itemID,
-                'details'         => $event_details->details,
-                'alertName'       => $event_details->alertName,
-                'result'          => $event_details->result,
-                'notes'           => $event_details->notes,
-            );
+
+        // Query the databse for all the characters and some related
+        // information
+        $characters = DB::table('account_apikeyinfo_characters')
+            ->leftJoin('seat_keys', 'account_apikeyinfo_characters.keyID', '=', 'seat_keys.keyID')
+            ->join('character_charactersheet', 'account_apikeyinfo_characters.characterID', '=', 'character_charactersheet.characterID')
+            ->join('character_skillintraining', 'account_apikeyinfo_characters.characterID', '=', 'character_skillintraining.characterID')
+            ->orderBy('seat_keys.isOk', 'asc')
+            ->orderBy('account_apikeyinfo_characters.characterName', 'asc')
+            ->groupBy('account_apikeyinfo_characters.characterID');
+
+        $eventid = htmlspecialchars($eventid);
+        $event_details = \DB::table('security_events')
+            ->join('security_alerts','security_alerts.alertID','=','security_events.alertID')
+            ->where('id',$eventid)
+            ->first();
+        $event[$event_details->id] = array (
+            'eventid'         => $event_details->id,
+            'characterID'     => $event_details->characterID,
+            'peopleGroupID'   => $this->characterPeopleGroup($event_details->characterID),
+            'itemID'          => $event_details->itemID,
+            'details'         => $event_details->details,
+            'alertName'       => $event_details->alertName,
+            'result'          => $event_details->result,
+            'notes'           => $event_details->notes,
+        );
+
+        if(\Auth::hasAccess('wdir') || ) {
             return View::make('security.details')
                 ->with('event',$event);
+        }elseif (\Auth::hasAccess('recruiter')){
+            $characters = $characters->whereIn('seat_keys.keyID', Session::get('valid_keys'))
+                ->where('account_apikeyinfo_characters.characterID',$event_details->characterID)
+                ->get();
+            if($characters)
+                return View::make('security.details')
+                    ->with('event',$event);
+            else
+                App::abort(404);
         }else{
             App::abort(404);
         }
+
     }
 
     /*
