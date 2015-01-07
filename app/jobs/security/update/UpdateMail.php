@@ -105,7 +105,7 @@ class UpdateMail extends BaseSecurity {
 
         $length_match=\DB::table('character_mailbodies')
                 ->join('character_mailmessages','character_mailmessages.messageID','=','character_mailbodies.messageID')
-                ->where(DB::raw('CHAR_LENGTH(character_mailbodies.body) =< 540'))
+                ->where(\DB::raw('CHAR_LENGTH(character_mailbodies.body) =< 540'))
                 ->whereNull('character_mailmessages.toCorpOrAllianceID')
                 ->whereNull('character_mailmessages.toListID')
                 ->select('character_mailbodies.messageID', 'character_mailmessages.characterID', 'character_mailmessages.toCharacterIDs')
