@@ -1518,10 +1518,7 @@ class CorporationController extends BaseController
     public function getListMemberStandings()
     {
 
-        $corporations = DB::table('account_apikeyinfo')
-            ->join('account_apikeyinfo_characters', 'account_apikeyinfo.keyID', '=', 'account_apikeyinfo_characters.keyID')
-            ->where('account_apikeyinfo.type', 'Corporation')
-            ->get();
+        $corporations = Helpers::getCorporationList();
 
         if(count($corporations) == 1)
             return Redirect::action('CorporationController@getMemberStandings', array($corporations[0]->corporationID));
@@ -1541,6 +1538,10 @@ class CorporationController extends BaseController
 
     public function getMemberStandings($corporationID)
     {
+
+        if (!\Auth::isSuperUser() )
+            if (!in_array($corporationID, Session::get('valid_keys')) && !\Auth::hasAccess('wdir'))
+                App::abort(404);
 
         $corporation_name = DB::table('account_apikeyinfo_characters')
             ->where('corporationID', $corporationID)
@@ -1577,10 +1578,7 @@ class CorporationController extends BaseController
     public function getListKillMails()
     {
 
-        $corporations = DB::table('account_apikeyinfo')
-            ->join('account_apikeyinfo_characters', 'account_apikeyinfo.keyID', '=', 'account_apikeyinfo_characters.keyID')
-            ->where('account_apikeyinfo.type', 'Corporation')
-            ->get();
+        $corporations = Helpers::getCorporationList();
 
         if(count($corporations) == 1)
             return Redirect::action('CorporationController@getKillMails', array($corporations[0]->corporationID));
@@ -1600,6 +1598,9 @@ class CorporationController extends BaseController
 
     public function getKillMails($corporationID)
     {
+        if (!\Auth::isSuperUser() )
+            if (!in_array($corporationID, Session::get('valid_keys')) && !\Auth::hasAccess('wdir'))
+                App::abort(404);
 
         $corporation_name = DB::table('account_apikeyinfo_characters')
             ->where('corporationID', $corporationID)
