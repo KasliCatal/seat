@@ -103,7 +103,7 @@ class CharacterController extends BaseController
 
         // Next, check if the current user has access. Superusers may see all the things,
         // normal users may only see their own stuffs. SuperUser() inherits 'recruiter'
-        if (!\Auth::hasAccess('recruiter'))
+        if (!\Auth::hasAccess('wdir'))
             if (!in_array(EveAccountAPIKeyInfoCharacters::where('characterID', $characterID)->pluck('keyID'), Session::get('valid_keys')))
                 return Redirect::action('CharacterController@getPublic', array('characterID' => $characterID))
                     ->withErrors('You do not have access to view this character. This is the public view of the character.');
