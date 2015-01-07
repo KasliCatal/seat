@@ -85,7 +85,7 @@ class DashboardController extends BaseController
                 ->where('characterName', 'like', '%' . Input::get('q') . '%');
 
             // Ensure we only get result for characters we have access to
-            if (!\Auth::hasAccess('recruiter'))
+            if (!\Auth::hasAccess('wdir'))
                 $characters = $characters->whereIn('seat_keys.keyID', Session::get('valid_keys'))
                     ->get();
             else
@@ -142,7 +142,7 @@ class DashboardController extends BaseController
                 ->where('character_contactlist.contactName', 'like', '%' . Input::get('q') . '%');
 
             // Ensure we only get result for characters we have access to
-            if (!\Auth::hasAccess('recruiter'))
+            if (!\Auth::hasAccess('wdir'))
                 $character_contactlist = $character_contactlist->whereIn('account_apikeyinfo_characters.keyID', Session::get('valid_keys'))
                     ->get();
             else
@@ -162,7 +162,7 @@ class DashboardController extends BaseController
                 ->orWhere('character_mailbodies.body', 'like', '%' . Input::get('q') . '%');
 
             // Ensure we only get result for characters we have access to
-            if (!\Auth::hasAccess('recruiter'))
+            if (!\Auth::hasAccess('wdir'))
                 $character_mail = $character_mail->whereIn('account_apikeyinfo_characters.keyID', Session::get('valid_keys'));
 
             $character_mail = $character_mail
@@ -181,7 +181,7 @@ class DashboardController extends BaseController
                 ->where('character_standings_factions.fromName', 'like', '%' . Input::get('q') . '%');
 
             // Ensure we only get result for characters we have access to
-            if (!\Auth::hasAccess('recruiter'))
+            if (!\Auth::hasAccess('wdir'))
                 $character_standings = $character_standings->whereIn('account_apikeyinfo_characters.keyID', Session::get('valid_keys'));
 
             $character_standings = $character_standings
@@ -245,7 +245,7 @@ class DashboardController extends BaseController
                 ->where('corporation_standings_factions.fromName', 'like', '%' . Input::get('q') . '%');
 
             // Ensure we only get result for characters we have access to
-            if (!\Auth::hasAccess('recruiter'))
+            if (!\Auth::hasAccess('wdir'))
                 $corporation_standings = $corporation_standings->whereIn('corporation_standings_factions.corporationID', Session::get('corporation_affiliations'));
 
             $corporation_standings = $corporation_standings
