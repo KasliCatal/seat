@@ -106,12 +106,12 @@ class SecurityController extends BaseController {
                 ->join('eve_characterinfo','eve_characterinfo.characterID','=','security_events.characterID')
                 ->join('security_alerts','security_alerts.alertID','=','security_events.alertID')
                 ->where('eve_characterinfo.characterName','like',"%$search_criteria%")
-                ->where('characterID',$character->characterID)
+                ->where('security_events.characterID',$character->characterID)
                 ->select('security_events.*', 'security_alerts.alertName');
             $search_events = DB::table('security_events')
                 ->join('security_alerts','security_alerts.alertID','=','security_events.alertID')
                 ->where('id',$search_criteria)
-                ->where('characterID',$character->characterID)
+                ->where('security_events.characterID',$character->characterID)
                 ->select('security_events.*', 'security_alerts.alertName')
                 ->union($search_characters)
                 ->get();
