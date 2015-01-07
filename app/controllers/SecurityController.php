@@ -204,11 +204,11 @@ class SecurityController extends BaseController {
         else
             $characters = $characters->get();
 
-        foreach( $characters as $character) {
+        foreach( $characters as $char_list) {
             $open_events = \DB::table('security_events')
                 ->join('security_alerts','security_alerts.alertID','=','security_events.alertID')
                 ->where('result',0)
-                ->where('CharacterID',$character->CharacterID)
+                ->where('CharacterID',$character->characterID)
                 ->get();
             foreach ($open_events as $row) {
 
