@@ -136,9 +136,6 @@ class SecurityController extends BaseController {
         else
             return Redirect::action('SecurityController@getView')
                 ->withError($search_criteria . ' Not Found');
-        }else{
-            App::abort(404);
-        }
     }
 
     /*
