@@ -48,11 +48,11 @@
                   <td>{{ $e->refTypeName }}</td>
                   <td>
                     <img src='{{ App\Services\Helpers\Helpers::generateEveImage($e->ownerID1, 32) }}' class='img-circle' style='width: 18px;height: 18px;'>
-                    <a href="{{ action('CharacterController@getFullWalletJournal', array('characterID' => $e->ownerID1)) }}"> {{ $e->ownerName1 }} </a>
+                    <a href="{{ action('CharacterController@getView', array('characterID' => $e->ownerID1)) }}"> {{ $e->ownerName1 }} </a>
                   </td>
                   <td>
                     <img src='{{ App\Services\Helpers\Helpers::generateEveImage($e->ownerID2, 32) }}' class='img-circle' style='width: 18px;height: 18px;'>
-                    <a href="{{ action('CharacterController@getFullWalletJournal', array('characterID' => $e->ownerID2)) }}"> {{ $e->ownerName2 }} </a>
+                    <a href="{{ action('CharacterController@getView', array('characterID' => $e->ownerID2)) }}"> {{ $e->ownerName2 }} </a>
                   </td>
                   <td>{{ $e->argName1 }}</td>
                   <td data-sort="{{ $e->amount }}">
