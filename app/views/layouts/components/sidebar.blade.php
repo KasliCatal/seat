@@ -103,7 +103,7 @@
         </a>
         <ul class="treeview-menu">
           <li><a href="{{ action('CharacterController@getAll') }}"><i class="fa fa-angle-double-right"></i> All Characters</a></li>
-          @if(\Auth::hasAccess('W-DIR'))
+          @if(\Auth::hasAccess('wdir'))
             <li><a href="{{ action('CharacterController@getSearchAssets') }}"><i class="fa fa-angle-double-right"></i> Asset Search</a></li>
           @endif
           <li><a href="{{ action('MailController@getSubjects') }}"><i class="fa fa-angle-double-right"></i> Mail Subjects</a></li>
