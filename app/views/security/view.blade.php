@@ -56,12 +56,21 @@
 
                 <tr>
                   <td>{{ $event['eventid'] }}</td>
-                  <td>
-                    <a href="{{ action('CharacterController@getView', array('characterID' => $event['characterID'])) }}"><span rel="id-to-name">{{ $event['characterID'] }}</span></a>
-                  </td>
-                  <td>
-                    <a href="{{ action('CharacterController@getView', array('characterID' => $event['peopleGroupID'])) }}"><span rel="id-to-name">{{ $event['peopleGroupID'] }}</span></a>
-                  </td>
+                  @if($event['alertID'] == '9')
+                    <td>
+                      <a href="{{ action('CorporationController@getJournal', array('corporationID' => $event['characterID'])) }}"><span rel="id-to-name">{{ $event['characterID'] }}</span></a>
+                    </td>
+                    <td>
+                      <a href="{{ action('CorporationController@getJournal', array('corporationID' => $event['peopleGroupID'])) }}"><span rel="id-to-name">{{ $event['peopleGroupID'] }}</span></a>
+                    </td>
+                  @else
+                    <td>
+                      <a href="{{ action('CharacterController@getView', array('characterID' => $event['characterID'])) }}"><span rel="id-to-name">{{ $event['characterID'] }}</span></a>
+                    </td>
+                    <td>
+                      <a href="{{ action('CharacterController@getView', array('characterID' => $event['peopleGroupID'])) }}"><span rel="id-to-name">{{ $event['peopleGroupID'] }}</span></a>
+                    </td>
+                  @endif
                   <td>{{ $event['alertName'] }}</td>
                   @if($event['alertName'] == 'Mail')
                     <td>
@@ -72,6 +81,12 @@
                   @elseif($event['alertName'] == 'Wallet Journal > 500m' || $event['alertName'] == 'Wallet Journal == 5m' )
                     <td>
                       <a href="{{ action('CharacterController@getFullWalletJournal', array('characterID' => $event['characterID'])) }}" class="btn btn-default btn-sm">
+                        <i class="fa fa-money"></i> {{ $event['details'] }}
+                      </a>
+                    </td>
+                  @elseif($event['alertID'] == '9')
+                    <td>
+                      <a href="{{ action('CorporationController@getLedgerSummary', array('corporationID' => $event['characterID'])) }}" class="btn btn-default btn-sm">
                         <i class="fa fa-money"></i> {{ $event['details'] }}
                       </a>
                     </td>

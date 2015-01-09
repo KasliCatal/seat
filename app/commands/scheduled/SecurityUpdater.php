@@ -96,6 +96,10 @@ class SecurityUpdater extends ScheduledCommand {
                 // Add the Security checker job to the queue
                 \App\Services\Queue\QueueHelper::addToQueue('\Seat\EveQueues\Security\CharacterUpdate', $key->keyID, $key->vCode, 'Security', 'Character');
             }
+            if ($access['type'] == 'Corporation') {
+                // Add the Security checker job to the queue
+                \App\Services\Queue\QueueHelper::addToQueue('\Seat\EveQueues\Security\CorporationUpdate', $key->keyID, $key->vCode, 'Security', 'Corporation');
+            }            
         }
         // Check mail once per hour, not per char
         \App\Services\Queue\QueueHelper::addToQueue('\Seat\EveQueues\Security\MailUpdate', '0', NULL, 'Security', 'Mail');
