@@ -260,7 +260,7 @@ class SecurityController extends BaseController {
             'itemID'          => $event_details->itemID,
             'details'         => $event_details->details,
             'alertName'       => $event_details->alertName,
-            'alertID'         => $row->alertID
+            'alertID'         => $row->alertID,
             'result'          => $event_details->result,
             'notes'           => $event_details->notes,
         );
