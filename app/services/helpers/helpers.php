@@ -468,7 +468,7 @@ class Helpers
             }
         }
         foreach ( \SecurityKeywords::where('security_keywords.type','corp')->get() as $corp_list ){
-            array_push($corporation_blacklist,$corp_list->corporationID);
+            array_push($corporation_blacklist,$corp_list->keyword);
         }
 
         return $corporation_blacklist;
