@@ -294,6 +294,7 @@ class SecurityController extends BaseController {
 
     public function getView()
     {
+        $events =[];
         // Query the databse for all the characters and some related
         // information
         $characters = DB::table('account_apikeyinfo_characters')
