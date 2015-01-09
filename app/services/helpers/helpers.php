@@ -364,7 +364,7 @@ class Helpers
     |--------------------------------------------------------------------------
     | getSecRolesArray()
     |--------------------------------------------------------------------------
-    | 
+    |
     | Converts a String or JSON Array of RoleIDs
     | to an Fancy Role Array with Corporation Division's
     |
@@ -378,7 +378,7 @@ class Helpers
 
     public static function getSecRolesArray($mixed_roles, $corporationID)
     {
-        
+
         if($mixed_roles == '' or $mixed_roles == '[]' or is_null($mixed_roles)) {
             return array("None");
         } else {
@@ -407,14 +407,14 @@ class Helpers
                 ->where('corporationID',$corporationID)
                 ->remember(0.1)
                 ->get();
-            
+
             $divisions_wallet = \DB::table('corporation_corporationsheet_walletdivisions')
                 ->select('accountKey','description')
                 ->orderBy('accountKey')
                 ->where('corporationID',$corporationID)
                 ->remember(0.1)
                 ->get();
-            
+
             foreach ($role_list as $role) {
                 $regex = "/(Hangar|Wallet Division|Container from Hangar)\s(\d)/";
 
@@ -441,4 +441,37 @@ class Helpers
             return  $fancy_roles;
         }
     }
+
+    /*
+    |--------------------------------------------------------------------------
+    | getCorporationBlacklist()
+    |--------------------------------------------------------------------------
+    |
+    | returns an array of all corps in the blacklist as well as corps whose
+    | alliance is in the blacklist
+    |
+    |
+    */
+    public static function getCorporationBlacklist()
+    {
+        $corporation_blacklist=[];
+
+        // Build an array with corpIDs for problematic alliances
+        foreach (\SecurityKeywords::where('security_keywords.type','alnc')->get() as $alliance_keywords ){
+            $member_corporations = \DB::table('eve_alliancelist_membercorporations')
+                ->join('eve_alliancelist','eve_alliancelist_membercorporations.allianceid','=','eve_alliancelist.allianceid')
+                ->where('eve_alliancelist.name',$alliance_keywords->keyword)
+                ->select('eve_alliancelist_membercorporations.corporationID')
+                ->get();
+            foreach($member_corporations as $corporation){
+                array_push($corporation_blacklist,$corporation->corporationID);
+            }
+        }
+        foreach ( \SecurityKeywords::where('security_keywords.type','corp')->get() as $corp_list ){
+            array_push($corporation_blacklist,$corp_list->corporationID);
+        }
+
+        return $corporation_blacklist;
+    }
+
 }
