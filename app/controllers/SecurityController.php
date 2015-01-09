@@ -1,6 +1,8 @@
 <?php
 
 use Pheal\Pheal;
+use Seat\EveApi\BaseApi;
+use Seat\EveApi\Account;
 
 class SecurityController extends BaseController {
 
