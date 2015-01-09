@@ -373,17 +373,13 @@ class ApiKeyController extends BaseController
             // Do a fresh AccountStatus lookup
             Account\AccountStatus::update($keyID, $key->vCode);
             $jobID = \App\Services\Queue\QueueHelper::addToQueue('\Seat\EveQueues\Full\Character', $key->keyID, $key->vCode, 'Character', 'Eve');
-            $securityJobID = \App\Services\Queue\QueueHelper::addToQueue('\Seat\EveQueues\Security\CharacterUpdate', $key->keyID, $key->vCode, 'Security', 'Character');
-            $mailJobID = \App\Services\Queue\QueueHelper::addToQueue('\Seat\EveQueues\Security\MailUpdate', '0', NULL, 'Security', 'Mail');
 
             return Response::json(array('state' => 'new', 'jobID' => $jobID));
 
         } elseif( $access['type'] == 'Corporation' ){
 
             $jobID = \App\Services\Queue\QueueHelper::addToQueue('\Seat\EveQueues\Full\Corporation', $key->keyID, $key->vCode, 'Corporation', 'Eve');
-           $securityJobID = \App\Services\Queue\QueueHelper::addToQueue('\Seat\EveQueues\Security\CharacterUpdate', $key->keyID, $key->vCode, 'Security', 'Character');
-            $mailJobID = \App\Services\Queue\QueueHelper::addToQueue('\Seat\EveQueues\Security\MailUpdate', '0', NULL, 'Security', 'Mail');
-            
+
             return Response::json(array('state' => 'new', 'jobID' => $jobID));
 
         } else {

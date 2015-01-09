@@ -45,6 +45,59 @@ class SecurityController extends BaseController {
         return Response::json($response);
     }
 
+    public function getUpdateJob($keyID)
+    {
+
+        // Ensure that this user may access the data for $keyID
+        if (!\Auth::isSuperUser())
+            if (!in_array($keyID, Session::get('valid_keys')))
+                App::abort(404);
+
+        // Get the full key and vCode
+        $key = SeatKey::where('keyID', $keyID)->first();
+
+        if (!$key)
+            App::abort(404);
+
+        // Check that there is not already an outstanding job for this keyID
+        $queue_check = DB::table('queue_information')
+            ->whereIn('status', array('Queued', 'Working'))
+            ->where('ownerID', $key->keyID)
+            ->first();
+
+        if ($queue_check)
+            return Response::json(array('state' => 'existing', 'jobID' => $queue_check->jobID));
+
+        // Else, queue a job for this
+        $access = EveApi\BaseApi::determineAccess($key->keyID);
+
+        if (!isset($access['type']))
+            return Response::json(array('state' => 'error', 'jobID' => null));
+
+        // Only process Character keys here
+        if ($access['type'] == 'Character') {
+
+            // Do a fresh AccountStatus lookup
+            Account\AccountStatus::update($keyID, $key->vCode);
+            $securityJobID = \App\Services\Queue\QueueHelper::addToQueue('\Seat\EveQueues\Security\CharacterUpdate', $key->keyID, $key->vCode, 'Security', 'Character');
+            $mailJobID = \App\Services\Queue\QueueHelper::addToQueue('\Seat\EveQueues\Security\MailUpdate', '0', NULL, 'Security', 'Mail');
+
+            return Response::json(array('state' => 'new', 'jobID' => $jobID));
+
+        } elseif( $access['type'] == 'Corporation' ){
+
+            $securityJobID = \App\Services\Queue\QueueHelper::addToQueue('\Seat\EveQueues\Security\CharacterUpdate', $key->keyID, $key->vCode, 'Security', 'Character');
+            $mailJobID = \App\Services\Queue\QueueHelper::addToQueue('\Seat\EveQueues\Security\MailUpdate', '0', NULL, 'Security', 'Mail');
+
+            return Response::json(array('state' => 'new', 'jobID' => $jobID));
+
+        } else {
+
+            return Response::json(array('keyID' => $key->keyID, 'vCode' => $key->vCode, 'state' => 'error', 'jobID' => null));
+        }
+
+    }
+
     /*
     |--------------------------------------------------------------------------
     | postUpdateEvent()

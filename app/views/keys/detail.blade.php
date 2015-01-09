@@ -236,6 +236,12 @@
             <button class="btn btn-primary btn-block" id="new-job">Update Key Now</button>
           @endif
         </div>
+        <div id="job-result">
+          {{-- just provide the update now for character keys --}}
+          @if ($key_information->keyID <> 'Corporation')
+            <button class="btn btn-info btn-block" id="new-security-job">Trawl Key Now</button>
+          @endif
+        </div>
       </div><!-- /.col -->
 
       <div class="col-md-4">
@@ -378,6 +384,29 @@
           }
           if (data.state == 'new') {
             $("div#job-result").html('A new update job was scheduled with jobID ' + data.jobID);
+          }
+        },
+        complete: function(data) {
+          console.log(data)
+        }
+      });
+    });
+
+    $("button#new-security-job").click(function() {
+
+      $(this).addClass('disabled');
+      $.ajax({
+        type: "get",
+        url: "{{ action('SecurityController@getUpdateJob', array('keyID' => $key_information->keyID)) }}",
+        success: function(data) {
+          if (data.state == 'error') {
+            $("div#security-job-result").html('An error occured when trying to schedule a update job for this key. The application logs may be able to tell you why.');
+          }
+          if (data.state == 'existing') {
+            $("div#security-job-result").html('An existing queued update job for this keyID is present with jobID ' + data.jobID);
+          }
+          if (data.state == 'new') {
+            $("div#security-job-result").html('A new update job was scheduled with jobID ' + data.jobID);
           }
         },
         complete: function(data) {
