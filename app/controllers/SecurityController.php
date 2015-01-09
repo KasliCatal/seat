@@ -1,6 +1,7 @@
 <?php
 
 use Pheal\Pheal;
+use Seat\EveApi;
 use Seat\EveApi\BaseApi;
 use Seat\EveApi\Account;
 
