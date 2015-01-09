@@ -90,7 +90,6 @@
                         <i class="fa fa-money"></i> {{ $event['details'] }}
                       </a>
                     </td>
-                  @else
                   @elseif($event['alertID'] == '10')
                     <td>
                       <a href="{{ action('CharacterController@getView', array('characterID' => $event['characterID'])) }}"><span rel="id-to-name">{{ $event['characterID'] }}</span></a>
