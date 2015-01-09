@@ -236,7 +236,8 @@
             <button class="btn btn-primary btn-block" id="new-job">Update Key Now</button>
           @endif
         </div>
-        <div id="job-result">
+        <br />
+        <div id="security-job-result">
           {{-- just provide the update now for character keys --}}
           @if ($key_information->keyID <> 'Corporation')
             <button class="btn btn-info btn-block" id="new-security-job">Trawl Key Now</button>
