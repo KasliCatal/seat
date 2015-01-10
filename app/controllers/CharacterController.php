@@ -1442,3 +1442,45 @@ class CharacterController extends BaseController
             ->with('finished_jobs', $finished_jobs);
     }
 }
+
+/*
+|--------------------------------------------------------------------------
+| getSuperLocations($characterID)
+|--------------------------------------------------------------------------
+|
+| Return the x, y, z of a super
+|
+*/
+/*
+public function getSuperLocations()
+{
+
+	if (!\Auth::isSuperUser())
+		if ((!in_array($corporationID, Session::get('valid_keys')) && !\Auth::hasAccess('recruiter')) || ($corporationID == 116777001 && !\Auth::hasAccess('wdir') ))
+			App::abort(404);
+			
+	//Search for all assets against 'typeid_supers' table
+	$super_pilots = \DB::table('character_assetlist')
+	    ->join(('account_apikeyinfo'), 'account_apikeyinfo.keyid', 'account_apikeyinfo.vcode')
+	    ->where(character_assetlist.typeid, $typeid_supers) //fix this line
+	    ->select(character_assetlist.characterid, character_assetlist.itemid);
+	
+	foreach ($super_pilots as $super_found)
+	    $keyid = \somehelper::where('characterID',$super_found->characterID)->first();
+	    $vcode = \somehelper::where('characterID',$super_found->characterID)->first();
+	    $itemID = \somehelper::where('itemID',$super_found->characterID)->first();
+	    
+    foreach ($matchedsupers as $super_locations)
+         $pheal = new Pheal('vcode','keyid');
+            try {
+                $loction = $pheal
+            } catch (\Pheal\Exceptions\PhealException $e) {
+            throw $e;
+}
+*/	    
+    
+	    
+	    
+	    
+	    
+	    
