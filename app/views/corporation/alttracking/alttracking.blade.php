@@ -32,7 +32,7 @@
                     {{ $character->name }}
                     </a>
                   </td>
-				  <td>
+		  <td>
                     {{ $character->peopleGroupID }}
                   </td>
                   <td>
