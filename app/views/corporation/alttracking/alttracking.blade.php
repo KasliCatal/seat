@@ -19,7 +19,6 @@
               <th>Name</th>
               <th>People Group</th>
               <th>Corporation</th>
-			  <th>Key Status</th>
               <th></th>
             </thead>
             <tbody>
