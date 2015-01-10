@@ -135,6 +135,8 @@ class CorporationController extends BaseController
             ->with('wallet_transactions', $wallet_transactions)
             ->with('corporation_name', $corporation_name);
     }
+    
+
 
     /*
     |--------------------------------------------------------------------------
@@ -1451,26 +1453,53 @@ class CorporationController extends BaseController
     }
 
 }
-	/*
-	|--------------------------------------------------------------------------
-	| getListAltTracking()
-	|--------------------------------------------------------------------------
-	|
-	| Get a list of the corporations that we can display Member Tracking for
-	|
-	*/
-	public function getListAltTracking()
-	{
-		$corporations = Helpers::getCorporationList();
-		
-			if(count($corporations) == 1)
-				return Redirect::action('CorporationController@getAltTracking', array($corporations[0]->corporationID));
-				
-			return View::make('corporation.alttracking.listalttracking')
-			->with('corporations', $corporations);
-	}
+	
 
-
+    /*
+    |--------------------------------------------------------------------------
+    | characterPeopleGroup()
+    |--------------------------------------------------------------------------
+    |
+    | Accepts a characterID and returns the characterID of the people group it
+    | belongs to. If none is found it just returns its own characterID
+    |
+    */
+     
+    public function characterPeopleGroup($characterID)
+    {
+        $character_people_group = DB::table('seat_people_main')
+                ->join('seat_people','seat_people_main.personID','=','seat_people.personID')
+                ->join('account_apikeyinfo_characters','account_apikeyinfo_characters.keyID','=','seat_people.keyID')
+                ->where('account_apikeyinfo_characters.characterID',$characterID)
+                ->select('seat_people_main.characterID')
+                ->first();
+        if (isset ($character_people_group )){
+            return $character_people_group->characterID;
+        }else{
+            return $characterID;
+        }
+    }
+     
+    /*
+    |--------------------------------------------------------------------------
+    | getListAltTracking()
+    |--------------------------------------------------------------------------
+    |
+    | Get a list of the corporations that we can display Member Tracking for
+    |
+    */
+    public function getListAltTracking()
+    {
+        $corporations = Helpers::getCorporationList();
+     
+        if(count($corporations) == 1)
+            return Redirect::action('CorporationController@getAltTracking', array($corporations[0]->corporationID));
+     
+        return View::make('corporation.alttracking.listalttracking')
+            ->with('corporations', $corporations);
+    }
+     
+     
     /*
     |--------------------------------------------------------------------------
     | getAltTracking($corporationID)
@@ -1479,41 +1508,38 @@ class CorporationController extends BaseController
     | Get all of the characters on record
     |
     */
-
+     
     public function getAltTracking($corporationID)
     {
-		
-		$alts_compare=[];
-		$matchedalts=[];
-		$blacklist = Helpers::getCorporationBlackList()
-		if (!\Auth::isSuperUser())
-			if ((!in_array($corporationID, Session::get('valid_keys')) && !\Auth::hasAccess('recruiter')) || ($corporationID == 116777001 && !\Auth::hasAccess('wdir') ))
-				App::abort(404);
-		
+        $matched_alts=[];
+        $blacklist = Helpers::getCorporationBlackList();
+     
+        if (!\Auth::isSuperUser())
+            if ((!in_array($corporationID, Session::get('valid_keys')) && !\Auth::hasAccess('recruiter')) || ($corporationID == 116777001 && !\Auth::hasAccess('wdir') ))
+                App::abort(404);
+     
         // get Mains and all their alts in this corp
-		$alts_unmatched = \DB::table('seat_people_main')
-			->join(('account_apikeyinfo_characters'), 'account_apikeyinfo_characters.characterID', '=' ,'seat_people_main.characterID')
-			->where(account_apikeyinfo_characters.corporationID, $corporationID)
-			->groupBy(seat_people_main.characterID)
-			->select(account_apikeyinfo_characters.characterID)
-			->get();	
-		foreach($alts_unmatched as $alt){
-			array_push($alts_compare, $alt -> 'account_apikeyinfo_characters.characterID')
-		}	
-
-
-		// loop through the alts in our array
-			foreach ($alt as $character_id) {
-				
-				$char = \EveAccountAPIKeyInfoCharacters::where('characterID',$character_id)->first()
-					
-					// look for a match between the corpID from employment history and the corp blacklist
-					if ( in_array($employer_id->corporationID,$blacklist) ){
-						array_push($matchedalts, $character_id -> characterID)
-					}
-			}
-	
-		return View::make('corporation.alttracking.alttracking')
-			->with('matched_alts', $matchedalts)
-
+        $alt_list = \DB::table('seat_people_main')
+            ->join(('account_apikeyinfo_characters'), 'account_apikeyinfo_characters.characterID', '=' ,'seat_people_main.characterID')
+            ->where(account_apikeyinfo_characters.corporationID, $corporationID)
+            ->groupBy(seat_people_main.characterID)
+            ->select(account_apikeyinfo_characters.characterID)
+            ->get();
+     
+        // loop through the alts in our array
+        foreach ($alt_list as $alt) {
+            $alt_info = \EveAccountAPIKeyInfoCharacters::where('characterID',$alt->characterID)->first();
+     
+            // look for a match between the corpID from employment history and the corp blacklist
+            if ( in_array($alt_info->corporationID,$blacklist) )
+                $matchedalts[$alt->characterID] = array (
+                    'peopleGroupID'   => $this->characterPeopleGroup($alt_info->characterID),
+                    'corporationID'   => $alt_info->corporationID
+                );
+        }
+     
+        return View::make('corporation.alttracking.alttracking')
+            ->with('matched_alts', $matchedalts)
+     
     }
+
