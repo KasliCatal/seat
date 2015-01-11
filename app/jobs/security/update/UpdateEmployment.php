@@ -38,6 +38,7 @@ class UpdateEmployment extends BaseSecurity {
         // Check if this key has any characters associated with it
         if (!$characters)
             return;
+
         // get the corp blacklist
         $blacklist = Helpers::getCorporationBlacklist();
 
