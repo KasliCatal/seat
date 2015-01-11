@@ -157,11 +157,18 @@ class DashboardController extends BaseController
             $character_mail = DB::table('character_mailmessages')
                 ->join('account_apikeyinfo_characters', 'character_mailmessages.characterID', '=', 'account_apikeyinfo_characters.characterID')
                 ->join('character_mailbodies', 'character_mailmessages.messageID', '=', 'character_mailbodies.messageID')
+<<<<<<< HEAD
                 ->where(function($query)
                 {
                     $query->where('character_mailmessages.senderName', 'like', '%' . Input::get('q') . '%')
                     ->orWhere('character_mailmessages.title', 'like', '%' . Input::get('q') . '%')
                     ->orWhere('character_mailbodies.body', 'like', '%' . Input::get('q') . '%');
+=======
+                ->where(function($query) {
+                    $query->where('character_mailmessages.senderName', 'like', '%' . Input::get('q') . '%')
+                        ->orWhere('character_mailmessages.title', 'like', '%' . Input::get('q') . '%')
+                        ->orWhere('character_mailbodies.body', 'like', '%' . Input::get('q') . '%');
+>>>>>>> upstream/dev
                 });
 
             // Ensure we only get result for characters we have access to
