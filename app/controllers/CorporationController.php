@@ -1511,7 +1511,7 @@ class CorporationController extends BaseController
      
     public function getAltTracking($corporationID)
     {
-        $matched_alts=[];
+        $matchedalts=[];
         $blacklist = Helpers::getCorporationBlackList();
      
         if (!\Auth::isSuperUser())
