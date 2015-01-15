@@ -1539,7 +1539,7 @@ class CorporationController extends BaseController
         }
      
         return View::make('corporation.alttracking.alttracking')
-            ->with('matched_alts', $matchedalts)
+            ->with('matchedalts', $matchedalts)
      
     }
 
