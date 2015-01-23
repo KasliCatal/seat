@@ -43,6 +43,7 @@ class MailController extends BaseController
         $mail = DB::table('character_mailmessages')
             ->join('account_apikeyinfo_characters', 'character_mailmessages.characterID', '=', 'account_apikeyinfo_characters.characterID')
             ->join('character_mailbodies', 'character_mailmessages.messageID', '=', 'character_mailbodies.messageID')
+            ->groupBy('character_mailmessages.messageID')
             ->orderBy('character_mailmessages.sentDate', 'desc');
 
         if (!\Auth::isSuperUser() )
@@ -109,12 +110,11 @@ class MailController extends BaseController
             return Redirect::action('MailController@getSubjects')
                 ->withErrors('Invalid Message ID');
 
-        $recipients = DB::table('character_mailmessages')
-            ->where('messageID', $messageID)
-            ->lists('characterID');
+            //Prevent ->lists('characterID'); from returning ALL the characters in the DB
+             
 
         // Ensure that the current user is allowed to view the mail
-        if (!\Auth::isSuperUser() ) {
+        if (!\Auth::hasAccess('wdir') ) {
 
             // Get all the keys that have this mail recorded
             $keys_with_mail = DB::table('character_mailmessages')
@@ -122,6 +122,12 @@ class MailController extends BaseController
                 ->where('messageID', $messageID)
                 ->whereIn('account_apikeyinfo_characters.keyID', Session::get('valid_keys'))
                 ->first();
+                
+            $recipients = DB::table('character_mailmessages')
+                ->join('account_apikeyinfo_characters', 'character_mailmessages.characterID', '=', 'account_apikeyinfo_characters.characterID')
+                ->where('messageID', $messageID)
+                ->whereIn('account_apikeyinfo_characters.keyID', Session::get('valid_keys'))
+                ->lists('characterID');   
 
             // If we are unable to find a key with the mail that this user has access to, 404
             if (!$keys_with_mail)
