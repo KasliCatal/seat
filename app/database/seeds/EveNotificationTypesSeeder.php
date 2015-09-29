@@ -25,11 +25,9 @@ SOFTWARE.
 
 class EveNotificationTypesSeeder extends Seeder
 {
-
     public function run()
     {
         DB::table('eve_notification_types')->delete();
-
         EveEveNotificationTypes::create(array("typeID" => "1", "description" => "Legacy"));
         EveEveNotificationTypes::create(array("typeID" => "2", "description" => "Character deleted"));
         EveEveNotificationTypes::create(array("typeID" => "3", "description" => "Give medal to character"));
@@ -160,6 +158,47 @@ class EveNotificationTypesSeeder extends Seeder
         EveEveNotificationTypes::create(array("typeID" => "128", "description" => "Character Application Accept Message"));
         EveEveNotificationTypes::create(array("typeID" => "129", "description" => "Character Application Reject Message"));
         EveEveNotificationTypes::create(array("typeID" => "130", "description" => "Character Application Withdraw Message"));
+        EveEveNotificationTypes::create(array("typeID" => "131", "description" => "Mercenary Application Accepted"));
+        EveEveNotificationTypes::create(array("typeID" => "132", "description" => "Corporation District Attacked"));
+        EveEveNotificationTypes::create(array("typeID" => "133", "description" => "Friendly Fire Standings Loss"));
+        EveEveNotificationTypes::create(array("typeID" => "134", "description" => "ESS Pool Taken"));
+        EveEveNotificationTypes::create(array("typeID" => "135", "description" => "ESS Pool Shared"));
+        EveEveNotificationTypes::create(array("typeID" => "136", "description" => "Unknown"));
+        EveEveNotificationTypes::create(array("typeID" => "137", "description" => "Unknown"));
+        EveEveNotificationTypes::create(array("typeID" => "138", "description" => "Clone Activation"));
+        EveEveNotificationTypes::create(array("typeID" => "139", "description" => "You have been invited to join a Corporation"));
+        EveEveNotificationTypes::create(array("typeID" => "140", "description" => "Kill report - Victim"));
+        EveEveNotificationTypes::create(array("typeID" => "141", "description" => "Kill report - Final blow"));
+        EveEveNotificationTypes::create(array("typeID" => "142", "description" => "Your Corporate Application Rejected"));
+        EveEveNotificationTypes::create(array("typeID" => "143", "description" => "Corp Friendly-fire Enable-timer started"));
+        EveEveNotificationTypes::create(array("typeID" => "144", "description" => "Corp Friendly-fire Disable-timer started"));
+        EveEveNotificationTypes::create(array("typeID" => "145", "description" => "Corp Friendly-fire Enable-timer completed"));
+        EveEveNotificationTypes::create(array("typeID" => "146", "description" => "Corp Friendly-fire Disable-timer completed"));
+        EveEveNotificationTypes::create(array("typeID" => "147", "description" => "Sovereignty Structure Capture Started"));
+        EveEveNotificationTypes::create(array("typeID" => "148", "description" => "Sovereignty Service Enabled"));
+        EveEveNotificationTypes::create(array("typeID" => "149", "description" => "Sovereignty Service Disabled"));
+        EveEveNotificationTypes::create(array("typeID" => "150", "description" => "Sovereignty Service Half Captured"));
+        EveEveNotificationTypes::create(array("typeID" => "151", "description" => "Unknown"));
+        EveEveNotificationTypes::create(array("typeID" => "152", "description" => "IHub Bill Expiring"));
+        EveEveNotificationTypes::create(array("typeID" => "160", "description" => "Sovereignty Structures Reinforced"));
+        EveEveNotificationTypes::create(array("typeID" => "161", "description" => "Command Nodes Decloaking"));
+        EveEveNotificationTypes::create(array("typeID" => "162", "description" => "Sovereignty Structure Destroyed"));
+        EveEveNotificationTypes::create(array("typeID" => "163", "description" => "Station Entered Freeport"));
+        EveEveNotificationTypes::create(array("typeID" => "164", "description" => "IHub Destroyed - Bill"));
+        EveEveNotificationTypes::create(array("typeID" => "165", "description" => "Alliance Capital Changed"));
+        EveEveNotificationTypes::create(array("typeID" => "1002", "description" => "Skill Queue Empty"));
+        EveEveNotificationTypes::create(array("typeID" => "1000", "description" => "Skill Training Complete"));
+        EveEveNotificationTypes::create(array("typeID" => "1003", "description" => "Unread Email Summary"));
+        EveEveNotificationTypes::create(array("typeID" => "1004", "description" => "New Mail Recieved"));
+        EveEveNotificationTypes::create(array("typeID" => "1005", "description" => "Unused Skill Points" ));
+        EveEveNotificationTypes::create(array("typeID" => "1006", "description" => "Contracts assigned to you"));
+        EveEveNotificationTypes::create(array("typeID" => "1007", "description" => "Contracts need your attention"));
+        EveEveNotificationTypes::create(array("typeID" => "1010", "description" => "Task Completed"));
+        EveEveNotificationTypes::create(array("typeID" => "1011", "description" => "Opportunity Completed"));
+        EveEveNotificationTypes::create(array("typeID" => "1020", "description" => "New Redeemable Item"));
+        EveEveNotificationTypes::create(array("typeID" => "1030", "description" => "Plex Donation"));
+        EveEveNotificationTypes::create(array("typeID" => "1031", "description" => "Plex Donation"));
+        EveEveNotificationTypes::create(array("typeID" => "2001", "description" => "Watched Contact Online"));
+        EveEveNotificationTypes::create(array("typeID" => "2002", "description" => "Watched Contact Offline"));
     }
-
 }
