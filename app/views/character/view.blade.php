@@ -127,7 +127,19 @@
       </div><!-- nav-tabs-custom -->
     </div><!-- ./col-md-12 -->
   </div><!-- ./row -->
-
+<div class="modal fade" id="notification-modal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+          <h4 class="modal-title"><i class="fa fa-eye"></i>Description</h4>
+        </div>
+        <div class="modal-body">
+          <p class="text-center"><b>The Body</b></p>
+        </div>
+      </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+  </div><!-- /.modal -->
 @stop
 
 @section('javascript')
