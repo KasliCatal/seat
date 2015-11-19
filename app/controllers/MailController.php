@@ -143,4 +143,24 @@ class MailController extends BaseController
             ->with('mailing_list_names', $mailing_list_names)
             ->with('recipients', $recipients);
     }
+    /*
+    |--------------------------------------------------------------------------
+    | getReadNotification()
+    |--------------------------------------------------------------------------
+    |
+    | Display a single notification message for Modal
+    |
+    */
+
+    public function getNotificationModal($notificationID = 0)
+    {
+        $notifications = DB::table('character_notifications')
+            ->join('eve_notification_types', 'character_notifications.typeID', '=', 'eve_notification_types.typeID')
+            ->join('character_notification_texts', 'character_notifications.notificationID', '=', 'character_notification_texts.notificationID')
+            ->where('character_notifications.notificationID', '=', $notificationID)
+            ->first();
+
+        return View::make('mail.notification_modal')
+            ->with('notifications', $notifications);
+    }
 }
