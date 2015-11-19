@@ -30,8 +30,10 @@
                 </td>
                 <td>{{ $note->senderName }}</td>
                 <td><b>{{ $note->description }}</b></td>
-                <td><b>{{ str_limit($note->text, 80, $end = '...') }}</b></td>
-                <td></td>
+                <td><b>{{ str_limit($note->text, 50, $end = '...') }}</b></td>
+                <td>
+                   {{ HTML::linkAction('MailController@getNotificationModal', 'View Notification', array('notificationID' => $note->notificationID ), array('class' => 'btn btn-primary btn-xs pull-right', 'data-target' => '#notification-modal', 'data-toggle' => 'modal')) }}
+                </td>
               </tr>
 
             @endforeach
@@ -42,3 +44,5 @@
     </div>
   </div> <!-- ./col-md-12 -->
 </div> <!-- ./row -->
+
+
